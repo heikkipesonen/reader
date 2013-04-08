@@ -1,0 +1,163 @@
+
+.item.tile.has-image h2{
+	padding: 10px;
+	max-width: 100%;
+	word-wrap: break-word;
+	position: absolute;
+	bottom: 5%;
+	right: 0px;
+	font-size: 20pt;
+	color: #fff;
+
+	display: inline-block;
+	text-align: right;
+
+
+	text-shadow: 0px 0px 5px #000;
+	filter: dropshadow(color=#000, offx=0, offy=0);
+}
+
+.item.tile.thin h2{
+	bottom: 20%;
+}
+
+.item.tile.important h2{
+	bottom: 20%;
+}
+
+.item.tile .img-container{
+	position: relative;
+	width: 100%;
+	overflow: hidden;
+}
+
+.item.tile .img-container img{
+	width: 100%;
+	
+}
+
+.item.tile .date{
+	display: none;
+	position: absolute;
+	top:0px;
+	left: 0px;
+	color: #fff;
+}
+
+.item.tile .category{
+	position: absolute;
+	top: 0px;
+	right:0px;
+	padding: 10px;
+	color: #fff;
+}
+
+
+.item.tile.no-image{
+	min-height: 100px;
+	background-color: #fff;
+}
+
+.item.tile.no-image h2{
+	position: relative;
+	color: #000;
+	font-size: 20pt;
+	padding-top: 20px;
+	width: 80%;
+	word-wrap: break-word;
+	margin: 10%;
+}
+
+.item.tile.no-image .textcontainer{
+	width: 80%;
+	margin: 10%;
+	
+}
+
+
+.item.tile{
+	margin:-0.25px;
+	position: relative;
+	width: 50%;
+}
+
+.small-items-list{
+
+
+}
+
+.small-items-list li{
+	padding: 15px;
+	font-size: 14pt;
+}
+
+
+.item.tile.has-image{
+	width: 50%;
+}
+
+.item.tile.has-image.important{
+	width: 100%;
+}
+
+.item.tile .image-text{
+	position: absolute;
+	bottom: 0px;
+	width: 100%;
+	padding-top:10px;
+	padding-bottom:20px;
+	color: #eee;
+}
+
+.item.tile .image-text p{
+	margin-left:20px;
+	margin-right: 20px;
+}
+
+@media all and (max-width: 600px){
+	.item.tile{
+		width: 100%;
+	}
+
+	.item.tile.has-image{
+		width: 100%;
+	}
+	.item.tile.no-image h2{
+		padding-top: 10px;
+		width: 80%;
+		word-wrap: break-word;
+		margin: 2%;
+	}
+
+	.item.tile.no-image .textcontainer{
+		display: none;
+	}
+}
+
+@media all and (min-width: 1200px) and (max-width: 1499px){
+	.item.tile.no-image{
+		width: 33.33333%;
+	}
+	.item.tile.has-image{
+		width: 33.33333%;
+	}
+
+	.item.tile.has-image.important{
+		width: 66.66666%;
+	}
+
+}
+
+@media all and (min-width: 1500px){
+	.item.tile.no-image{
+		width: 25%;
+	}
+	.item.tile.has-image{
+		width: 25%;
+	}
+
+	.item.tile.has-image.important{
+		width: 50%;
+	}
+
+}
