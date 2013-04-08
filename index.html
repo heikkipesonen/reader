@@ -2,6 +2,7 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
 		<![if !IE]>
 		<script type="text/javascript" src="../lib/jquery-1.8.3.min.js"></script>
 		
@@ -15,6 +16,7 @@
 		<script type="text/javascript" src="itembuilder.js"></script>
 		<script type="text/javascript" src="functions.js"></script>
 		<script type="text/javascript" src="toolbar.js"></script>
+		<script type="text/javascript" src="gridmenu.js"></script>
 		
 		<script type="text/javascript" src="rupu.js"></script>
 		<script type="text/javascript"> var browser=true;</script>
@@ -23,6 +25,7 @@
 		<link rel="stylesheet" type="text/css" href="toolbar.css"></link>
 		<link rel="stylesheet" type="text/css" href="item.css"></link>
 		<link rel="stylesheet" type="text/css" href="page.css"></link>
+		<link rel="stylesheet" type="text/css" href="gridmenu.css"></link>
 
 		<![endif]>
 		<!--[if IE]>
@@ -33,6 +36,9 @@
 
 
 	<script type="text/javascript">
+
+
+
 
 	if (!browser){
 		document.write('Internet explorer not supported.');
@@ -50,8 +56,52 @@
 				$('#main-container').transit({'opacity':1},1500);
 			});
 
-			rp.getDatesList();
+			rp.getDatesList(function(list){
+				each(list,function(item){
+					item._id = item.date;
+					item.largetext = item.date;
+					item.smalltext = item.count;
+				});
 
+				var gm = new gridMenu('date-menu');
+				$('body').prepend(gm.getElement());
+
+				gm.addButton({
+					largetext:'ok',
+					smalltext:'accept selection',
+					_id:'return'
+				});
+				gm.addButton({
+					largetext:'clear',
+					smalltext:'deselect',
+					_id:'deselect'
+				});				
+
+				gm.addButton(list);
+				gm.setSize(window.innerWidth,window.innerHeight);
+				gm.setOption('selectMany',true);
+
+				
+				gm.eachButton(function(btn){
+					btn.setBackgroundColor( bg[ dateParser.getMonth(btn.getId()) ] || bg.default);
+				});
+
+				gm.on('click',function(id,btn){
+					if (id=='return'){
+						console.log(gm.getSelectedId());						
+						
+						rp.getNews( gm.getSelectedId() ,false);
+
+						gm.getElement().remove();
+					} else if (id=='deselect'){
+						gm.clear();
+					} else {						
+						gm.toggleButton(btn);
+					}
+				});
+
+				
+			});
 		});
 	}
 
@@ -60,10 +110,11 @@
 	</script>
 
 <body>	
+	<!--
 	<div id="startup-screen">
 		<h1 class="startup">dmo</h1>
 	</div>
-
+	-->
 	<div id="main-container">	
 		
 

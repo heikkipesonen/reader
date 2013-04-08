@@ -23,7 +23,21 @@ var colors = {
 	}
 }
 
-
+var bg = {
+	'01':[147,186,122,1],
+	'02':[86,177,255,1],
+	'03':[120,100,239,1],
+	'04':[219,101,49,1],
+	'05':[91,195,89,1],
+	'06':[198,45,67,1],
+	'07':[200,255,200,1],
+	'08':[200,255,200,1],
+	'09':[200,255,200,1],
+	'10':[200,255,200,1],
+	'11':[200,255,200,1],
+	'12':[200,0,0,1],
+	'default':[198,45,67,1]
+}
 
 
 
@@ -98,8 +112,14 @@ rupu.prototype = {
 
 		
 		this.scale();
-		this.getItems(1,false);
+		//this.getItems(1,false);
 		this._fire('start');
+
+
+		//me.showCategory('etusivu');				
+		me.mainScroll = new iScroll('main-container',{snap:'.pane',momentum:false,vScrollbar:false,hScrollbar:false,SnapThreshold:500,lockDirection:true});
+		me.showPane('main-pane',0);
+
 	},
 	// scale the elements according to screen size changes
 	scale:function() {
@@ -268,61 +288,72 @@ rupu.prototype = {
 
 		})
 	},
-	getItems:function(days,until,callback){
+	setMenu:function(){
 		var me = this;
+		var categories = newsParser.getCategories();
+		
+		me.tools.reset();
 
-		newsParser.getNews(days,until,function(news){
+		me.tools.addButton({
+			text:"valikko",
+			id:"menu",					
+			bg:colors['defaultColor'],
+			spancolor:[250,250,250,0.4],
+			action:function(id){
+				console.log(id);
+			},
+			target:"menu"
+		});
 
-			if (news){				
-
-				var categories = newsParser.getCategories();
-
+		each(categories,function(catg){
 				me.tools.addButton({
-					text:"valikko",
-					id:"menu",					
-					bg:colors['defaultColor'],
-					spancolor:[250,250,250,0.4],
-					action:function(id){
-						console.log(id);
-					},
-					target:"menu"
+						text:catg.name,
+						id:catg.name,
+						span:catg.items,
+						bg:colors[catg.name] || colors['defaultColor'],
+						spancolor:[250,250,250,0.4],
+						action:function(id){
+							me.showCategory(id);
+						},
+						target:catg.name
 				});
-
-
-				each(categories,function(catg){
-						me.tools.addButton({
-								text:catg.name,
-								id:catg.name,
-								span:catg.items,
-								bg:colors[catg.name] || colors['defaultColor'],
-								spancolor:[250,250,250,0.4],
-								action:function(id){
-									me.showCategory(id);
-								},
-								target:catg.name
-						});
-				});
-
-				me.tools.scaleHeight();
-				me.showCategory('etusivu');
-				me.scale();
-				
-				me.mainScroll = new iScroll('main-container',{snap:'.pane',momentum:false,vScrollbar:false,hScrollbar:false,SnapThreshold:500,lockDirection:true});
-				me.showPane('main-pane',0);
-				me._fire('load');
-			}
 		});
-	},
-	getDatesList:function(){
+
+		me.tools.scaleHeight();
+		me.scale();		
+	},		
+	getNews:function(date,end_date,callback){
 		var me = this;
+		this._fire('loadstart');
+		if (date instanceof Array){
+			var count = date.length;
+			for (var i in date){
 
-		newsParser.getDatabaseDates(function(list){
-			console.log(list);
-			
-			each(list,function(item){
+				newsParser.getNews(date[i],false,function(){
+					count--;
+					if (count == 0){
+						if (typeof(callback) == 'function'){
+							callback();
+						}						
+						me.setMenu();
+						me._fire('load');						
+					}
+				});
+			}
 
+
+		} else {
+			newsParser.getNews(date,end_date,function(news){
+				if (news){
+					me.setMenu();
+					me._fire('load');
+				}
 			});
-		});
+		}
+	},
+	getDatesList:function(callback){
+		var me = this;
+		newsParser.getDatabaseDates(callback);
 	},
 	on:function(name,fn){		
 		if (this._listeners[name] == undefined){

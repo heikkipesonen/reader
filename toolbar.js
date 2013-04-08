@@ -106,6 +106,10 @@ function toolbar(id){
 }
 
 toolbar.prototype = {
+		reset:function(){
+			this._element.buttonContainer.empty();
+			this._buttons = [];
+		},
 		setPanelColor:function(rgba){
 			this._element.container.css('background-color','rgba('+rgba.join(',')+')');
 			//this._element.panel.css('background-color','rgba('+rgba.join(',')+')');

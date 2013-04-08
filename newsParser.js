@@ -1,3 +1,36 @@
+var dateParser = {
+	strangeDate:{
+		getMonth:function(dateString){
+			return dateString.split('.')[2];
+		},
+		getYear:function(dateString){
+			return dateString.split('.')[1];	
+		},
+		getDay:function(dateString){
+			return dateString.split('.')[0];	
+		}
+	},
+
+	getYear:function(dateString){
+		return dateString.split('.')[2];
+	},
+	getMonth:function(dateString){
+		return dateString.split('.')[1];
+	},
+	getDay:function(dateString){
+		return dateString.split('.')[0];
+	},
+
+	convert:function(strangeDate){
+		if (strangeDate){
+			return strangeDate.split('.')[2] +'.'+ strangeDate.split('.')[1] +'.'+strangeDate.split('.')[0];
+		} else {
+			return strangeDate;
+		}
+	}
+}
+
+
 var newsParser = {
 	_news:[],
 	options:{
@@ -5,16 +38,19 @@ var newsParser = {
 	},
 	_url:'',
 	error:function(msg){
-
+		console.log('NEWSPARSER ERROR '+msg);
 	},
 	getView:function(name,startkey,endkey,callback){
 		var keys = '';
 		if (startkey || endkey){
 			keys = '?';
 		}
-		if (startkey){
+		if (startkey && endkey){
 			keys += 'startkey="'+startkey+'"';
+		} else if (!endkey){
+			keys += 'key="'+startkey+'"';
 		}
+
 		if (endkey){
 			if (startkey){
 				keys += '&';
@@ -43,15 +79,12 @@ var newsParser = {
 			});
 
 			for (var i in it){
-				it[i].date = me.parseDate(it[i].date);
+				it[i].date = dateParser.convert(it[i].date);
 			}
 
 			callback(it);
 		});
 	},
-	parseDate:function(strangeDate){
-		return strangeDate.split('.')[2] +'.'+ strangeDate.split('.')[1] +'.'+strangeDate.split('.')[0];
-	},	
 	getDates:function(){
 		var maxDate = 0;
 		var minDate = Infinity;
@@ -99,54 +132,51 @@ var newsParser = {
 			action(this._news[i]);
 		}
 	},
-	getNews:function(startTime,endTime,callback){
-					
-		//if (this.loadData() && !this.options.force){
-		//	callback(this.loadData());
-		//} else {
-			var me = this;		
-			this.getView('strdate',this.getDateString(startTime),this.getDateString(endTime),function(e){
-				
-				if (e){
-
-					var results = {};
-					
-					if (e.rows.length > 0){
-						results = me.parseResults(e);
-
-						if (results){
-							results.sort(function(a,b){
-								if (a.category < b.category) return -1;
-								if (a.category > b.category) return 1;
-								return 0;
-							});
-
-							me.setData(results);
-							me._loaded = true;
-							//me.saveData(results);
-						} else {
-							me.error('getNews error');
-						}
-				
-						if (callback){
-							callback(results);
-						} else {						
-							me.error('no callback at getnews');
-						}
-					} else {
-						me.error('load failure');
-						if (callback){
-							callback(false);
-						}
-					}
-
-
-				} else {
-					me.error('no data loaded');
-				}
+	sortResults:function(e){
+		var results = {};
+		results = this.parseResults(e);
+		if (results){
+			results.sort(function(a,b){
+				if (a.category < b.category) return -1;
+				if (a.category > b.category) return 1;
+				return 0;
 			});
-			
-		//}
+
+		} else {
+			this.error('getNews error');
+			return false;
+		}
+		return results;
+	},	
+	getNews:function(start_time_string,end_time_string,callback){					
+		var me = this;		
+		this.getView('strdate',dateParser.convert(start_time_string),dateParser.convert(end_time_string),function(e){				
+			if (e){
+				var results = {};					
+				if (e.rows.length > 0){
+					results = me.sortResults(e);						
+					me.setData(results);
+					me._loaded = true;						
+					if (callback){
+						callback(results);
+					} else {						
+						me.error('no callback at getnews');
+					}
+				} else {
+					me.error('load failure at getNews');
+					if (callback){
+						callback(false);
+					}
+				}
+
+
+			} else {
+				me.error('no data loaded');
+				if (callback){
+					callback(false);
+				}
+			}
+		});
 	},
 	getCategories:function(){
 		var list = [];
