@@ -17,7 +17,7 @@
 
 .gridmenu-button-textcontainer span.small-text{
 	font-size: 15pt;
-	font-family: arial narrow;
+	font-family: arial narrow, arial;
 	color: rgba(255,255,255,1);
 	position: absolute;
 	right: 5px;
@@ -25,7 +25,7 @@
 }
 
 .gridmenu-button-textcontainer span.large-text{
-	font-family: arial narrow;
+	font-family: arial narrow, arial;
 	font-size: 30pt;
 	color: rgba(255,255,255,1);
 	position: absolute;

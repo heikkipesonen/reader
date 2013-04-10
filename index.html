@@ -88,11 +88,11 @@
 
 				gm.on('click',function(id,btn){
 					if (id=='return'){
-						console.log(gm.getSelectedId());						
-						
+															
 						rp.getNews( gm.getSelectedId() ,false);
 
 						gm.getElement().remove();
+						
 					} else if (id=='deselect'){
 						gm.clear();
 					} else {						

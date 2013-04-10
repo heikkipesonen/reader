@@ -48,7 +48,8 @@ var rupu = function(){
 		hScrollbar:true,
 		vScrollbar:true,
 		fadeScrollbar:true,
-		hideScrollbar:true
+		hideScrollbar:true,
+		lockDirection:true
 	}
 	// elements for rupu to use
 	this.panes = {	
@@ -191,7 +192,11 @@ rupu.prototype = {
 	},
 	// show category of items by category name
 	showItems:function(items){
-		var me = this;
+		var me = this;		
+		var types = newsParser.getTypeCount(items);
+		
+		console.log(types)
+
 		var e = itemBuilder.build(items,{
 											b:'b',
 											s:'b',
@@ -200,11 +205,10 @@ rupu.prototype = {
 											}
 										});
 		
-		var types = newsParser.getTypeCount(items);
+
 
 		if (types.b%2 != 0){
 			var found =false;
-			var me = this;
 			
 			each(e,function(item){
 			 	if (me.testSize(item) == 'b' && item.hasClass('wide') && !found){
@@ -214,6 +218,7 @@ rupu.prototype = {
 			});
 			
 		}
+
 
 		this.showAtPane(e);
 		this._fire('showItems',items);

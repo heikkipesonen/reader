@@ -1,9 +1,4 @@
 	var itemBuilder = {
-		buildCategory:function(type,name){
-			var items = newsParser.getCategory(name);
-
-			return this.build(type,result);
-		},
 		build:function(items,opts){
 
 			var me = this;
@@ -32,14 +27,18 @@
 			return e;
 
 		},
-		b:function(item) {
-			return this.bigListItem(item);
+		buildList:function(items){
+			var list = $('<li class="item-container"></li>');
+
+			for (var i in items){
+				var e = this.smallListItem(items[i])
+				list.append(e);
+			}
+
+			return list;
 		},
-		s:function(item){
-			return this.smallListItem(item);
-		},
-		smallListItem:function(data,size){
-			var e = $('<li style="width:'+(size-16)+'px; border-color:'+colors.getColor(data.category)+'" class="clickable smallListItem listItem"></li>');
+		s:function(data){
+			var e = $('<li border-color:'+colors.getColor(data.category)+'" class="clickable smallListItem listItem"></li>');
 			e.attr('id',data._id);
 			e.attr('data-action','showItem');
 			e.attr('data-target',data._id);
@@ -60,7 +59,7 @@
 
 			return e;
 		},
-		bigListItem:function(data,size){
+		b:function(data,size){
 			var e = $('<div class="clickable item tile bigItem" data-action="showItem"  data-target="'+data._id+'"></div>');
 
 			e.attr('id',data._id);

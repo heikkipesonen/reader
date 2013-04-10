@@ -1,3 +1,6 @@
+.item.tile{
+	margin-left: -1px;
+}
 
 .item.tile.has-image h2{
 	padding: 10px;
@@ -37,11 +40,12 @@
 }
 
 .item.tile .date{
-	display: none;
+	font-size: 9pt;
+	color: #ddd;
 	position: absolute;
 	top:0px;
 	left: 0px;
-	color: #fff;
+	padding: 10px;
 }
 
 .item.tile .category{
@@ -150,14 +154,14 @@
 
 @media all and (min-width: 1500px){
 	.item.tile.no-image{
-		width: 25%;
+		width: 20%;
 	}
 	.item.tile.has-image{
-		width: 25%;
+		width: 40%;
 	}
 
 	.item.tile.has-image.important{
-		width: 50%;
+		width: 60%;
 	}
 
 }

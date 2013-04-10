@@ -5,7 +5,7 @@ function gridMenu(id,items){
 	}
 
 	this._element.scroller.append(this._element.container);
-
+	this._id = id;
 	this._opts = {
 		minButtonWidth:128,
 		cols:8,
@@ -19,6 +19,8 @@ function gridMenu(id,items){
 	if (items){
 		this.addButton(items);
 	}
+
+	this._scroll = false;
 }
 
 gridMenu.prototype = {
@@ -31,7 +33,7 @@ gridMenu.prototype = {
 		this._opts[key] = value;
 	},
 	setSize:function(width,height){
-		this._element.container.css({
+		this._element.scroller.css({
 			width:width,
 			height:height
 		});
@@ -152,6 +154,11 @@ gridMenu.prototype = {
 		for (var i in this._buttons){
 			this._buttons[i].setSize(btn_width,128,this._opts.margin);
 		}
+
+		if (this._scroll){
+			this._scroll.destroy();
+		}
+		this._scroll = new iScroll(this._id);
 	},
 	on:function(name,fn){		
 		if (this._listeners[name] == undefined){

@@ -61,6 +61,16 @@ var newsParser = {
 			callback( e );
 		});
 	},
+	hasDouble:function(newsItem){
+		var found = false;
+		this.each(function(item){
+			if (item.title == newsItem.title){
+				found = true;
+				console.log('double:'+newsItem._id)
+			}
+		});
+		return found;
+	},
 	getDatabaseDates:function(callback){
 		var me = this;
 		$.getJSON(this.options.url + '/_design/news/_view/dates?group_level=1',function(e){
@@ -109,7 +119,9 @@ var newsParser = {
 	},
 	setData:function(data){
 		for (var i in data){
-			this._news.push(data[i]);			
+			if (!this.hasDouble(data[i])){
+				this._news.push(data[i]);			
+			}
 		}
 	},
 	resetNews:function(){
@@ -255,6 +267,9 @@ var newsParser = {
 			}
 		}
 		if (results.length > 0){
+			results.sort(function(a,b){
+				return b.pubdate - a.pubdate;
+			})
 			return results;
 		} else {
 			return false;
