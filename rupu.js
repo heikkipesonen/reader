@@ -51,6 +51,16 @@ var rupu = function(){
 		hideScrollbar:true,
 		lockDirection:true
 	}
+	this.mainSrollOpts = {
+		snap:'.pane',
+		momentum:false,
+		vScrollbar:false,
+		hScrollbar:false,
+		SnapThreshold:500,
+		lockDirection:true
+	}
+
+
 	// elements for rupu to use
 	this.panes = {	
 		left : $('<div id="left-pane" class="pane"></div>'),
@@ -60,6 +70,7 @@ var rupu = function(){
 		main_scroller : $('<div id="main-pane-scroller"></div>'),
 		main_content : $('<div id="main-pane-content"></div>'),
 		container : $('<div id="main"></div>'),
+		
 		opts:{
 			rightPane:[20,100], // pane dimensions in percent, width and height
 			leftPane:[90,100],
@@ -76,13 +87,16 @@ var rupu = function(){
 	this.mainPaneScroll=false;	// main pane, the tile display scroll
 	this.tools = {};		// toolbar
 	this._listeners =[]; // event listeners registered for rupu
+
+	this._db = new dblink();
+	this._news = new itemStore();
 }
 rupu.prototype = {
 	// percentage values for window sizes
-	getWidth:function(pc){
+	_getWidth:function(pc){
 		return pc[0]* (window.innerWidth/100)
 	},
-	getHeight:function(pc){
+	_getHeight:function(pc){
 		return pc[1]* (window.innerHeight/100)
 	},
 	// start rupu
@@ -100,7 +114,7 @@ rupu.prototype = {
 		$(container).append(this.panes.container);
 
 		this.panes.left.hammer().on('tap',function(){
-			me.showPane('main-pane');
+			me._showPane('main-pane');
 		});
 
 		this.tools.setSize(['100%','100%'])
@@ -113,67 +127,17 @@ rupu.prototype = {
 
 		
 		this.scale();
-		//this.getItems(1,false);
-		this._fire('start');
-
-
-		//me.showCategory('etusivu');				
-		me.mainScroll = new iScroll('main-container',{snap:'.pane',momentum:false,vScrollbar:false,hScrollbar:false,SnapThreshold:500,lockDirection:true});
-		me.showPane('main-pane',0);
+		this._fire('start');	
+		this.mainScroll = new iScroll($(container).attr('id'),this.mainSrollOpts);
+		this._showPane('main-pane',0);
 
 	},
 	// scale the elements according to screen size changes
-	scale:function() {
-		this.lastResizeTime = Date.now();
-
-		this.panes.left.css({
-			position:'absolute',
-			top:'0px',
-			left:'0px',
-			width:this.getWidth(this.panes.opts.leftPane) > this.panes.opts.leftPaneMax ? this.panes.opts.leftPaneMax : this.getWidth(this.panes.opts.leftPane) < this.panes.opts.leftPaneMin ? this.panes.opts.leftPaneMin : this.getWidth(this.panes.opts.leftPane),
-			height:this.getHeight(this.panes.opts.leftPane)
-		});
-
-		this.panes.main.css({
-			position:'absolute',
-			top:'0px',
-			left:this.panes.left.width(),
-
-			width:this.getWidth(this.panes.opts.mainPane),
-			height:this.getHeight(this.panes.opts.mainPane)
-		});
-		
-		this.panes.main_scroller.css({
-			'min-height':this.panes.main.height(),
-			width:this.panes.main.width()
-		});
-
-		this.panes.right.css({
-			position:'absolute',
-			top:'0px',
-			left:this.panes.left.width() + this.panes.main.width(),
-
-			width:this.getWidth(this.panes.opts.rightPane) > this.panes.opts.rightPaneMax ? this.panes.opts.rightPaneMax : this.getWidth(this.panes.opts.rightPane) < this.panes.opts.rightPaneMin ? this.panes.opts.rightPaneMin : this.getWidth(this.panes.opts.rightPane),
-			height:this.getHeight(this.panes.opts.rightPane)
-		});
-
-		this.panes.container.css({
-			width:this.panes.left.width() + this.panes.main.width() + this.panes.right.width(),
-			height:window.innerHeight
-		});
-
-
-		if (this.mainPaneScroll && this.mainPaneScroll!=undefined){
-			this.mainPaneScroll.destroy();
-		}
-		this.mainPaneScroll = new iScroll('main-pane',this.iscrollOpts);
-		if (this.tools){
-			this.tools.scaleHeight();
-		}
+	scale:function() {		
 		this._fire('scale');
 	},
 	// scroll to certain pane with mainscroll-horizontal scroll
-	showPane:function(id,time){
+	_showPane:function(id,time){
 		if (time==undefined){
 			time=300;
 		}
@@ -183,7 +147,7 @@ rupu.prototype = {
 		}
 	},
 	// test news item size
-	testSize:function(item){
+	_testSize:function(item){
 		if (item.hasClass('smallListItem')){
 			return 's';
 		} else {
@@ -198,33 +162,8 @@ rupu.prototype = {
 	showItems:function(items){
 		var me = this;		
 		var types = newsParser.getTypeCount(items);
-		
-		
 
-		var e = itemBuilder.build(items,{
-											b:'b',
-											s:'b',
-											tap:function(id){													
-												me.showItem(id); 
-											}
-										});
-		
-
-
-		if (types.b%2 != 0){
-			var found =false;
-			
-			each(e,function(item){
-			 	if (me.testSize(item) == 'b' && item.hasClass('wide') && !found){
-					found = true;
-					item.addClass('important');
-				}
-			});
-			
-		}
-
-
-		this.showAtPane(e);
+	
 		this._fire('showItems',items);
 	},
 	showCategory:function(cat){
@@ -232,7 +171,7 @@ rupu.prototype = {
 		var items = newsParser.getCategory(cat);
 		this.showItems(items);
 		this._fire('categoryChange',cat);
-		this.showPane('main-pane');
+		this._showPane('main-pane');
 	},
 	// show news item in left pane display
 	showItem:function(id){
@@ -240,7 +179,7 @@ rupu.prototype = {
 		var container = this.panes.left;
 		
 		if (container.find('[data-item="'+id+'"]').length > 0){
-			me.showPane('left-pane');
+			me._showPane('left-pane');
 		} else {
 			var e = itemBuilder.fullView(id);
 
@@ -248,7 +187,7 @@ rupu.prototype = {
 				opacity:0,
 			},200,function(){
 				container.html(e);
-				me.showPane('left-pane');
+				me._showPane('left-pane');
 				if (me.pageScroll){
 					me.pageScroll.destroy();
 				}
@@ -297,8 +236,9 @@ rupu.prototype = {
 
 		})
 	},
-	setMenu:function(){
+	_setMenu:function(){
 		var me = this;
+		/*
 		var categories = newsParser.getCategories();
 		
 		me.tools.reset();
@@ -330,44 +270,29 @@ rupu.prototype = {
 
 		me.tools.scaleHeight();
 		me.scale();		
-	},		
-	getNews:function(date,end_date,callback){
+		*/
+	},	
+
+	getDate:function(date,end_date,callback){
 		var me = this;
-		this._fire('loadstart');
-		if (date instanceof Array){
-			var count = date.length;
-			for (var i in date){
+		this._fire('loadstart');		
+		
+		this._db.getView({
+			startkey:dateParser.convert(date),
+			endkey:dateParser.convert(end_date),
+			view:'strdate',			
+			callback:function(e){
+				me._fire('load',e);
 
-				newsParser.getNews(date[i],false,function(news){
-					count--;
-					if (count == 0){
-						if (typeof(callback) == 'function'){
-							callback(news);
-						}						
-						me.setMenu();
-						me._fire('load');						
-					}
-				});
-			}
-
-
-		} else {			
-			newsParser.getNews(date,end_date,function(news){
-				if (news){
-					me.setMenu();
-					me._fire('load');
-
+				for (var i in e){
+					me._news.add(new newsItem(e[i]));
 				}
-				if (typeof(callback) == 'function'){
-					callback(news);
-				}						
-			});
-		}
+
+				console.log( me._news.get('category','etusivu') );
+			}
+		});
 	},
-	getDatesList:function(callback){
-		var me = this;
-		newsParser.getDatabaseDates(callback);
-	},
+
 	on:function(name,fn){		
 		if (this._listeners[name] == undefined){
 			this._listeners[name] = Array();
