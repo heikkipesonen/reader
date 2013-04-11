@@ -31,7 +31,7 @@
 			var list = $('<li class="item-container"></li>');
 
 			for (var i in items){
-				var e = this.smallListItem(items[i])
+				var e = this.s(items[i])
 				list.append(e);
 			}
 
@@ -45,7 +45,6 @@
 
 			if (data.content){
 				if (data.content.length > 0){
-
 					e.append('<div class="list-img-container"><img src="'+IMG_URL +'thumb/'+ data.content[0].name+'" class="small-image"/></div>');
 					e.addClass('has-image');
 				}

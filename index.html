@@ -50,13 +50,17 @@
 			rp.start('#main-container');
 			
 			rp.on('load',function(){
+				console.log('load');
 				$('#startup-screen').transit({'opacity':0},1500,function(){
 					$(this).remove();
 				});
 				$('#main-container').transit({'opacity':1},1500);
-			});
 
-			rp.getDatesList(function(list){
+				rp.showCategory('etusivu');
+			});
+			rp.getDatesList(function(list){					
+				rp.getNews(list[0].date,false);
+/*
 				each(list,function(item){
 					item._id = item.date;
 					item.largetext = item.date;
@@ -101,6 +105,7 @@
 				});
 
 				
+		*/
 			});
 		});
 	}

@@ -163,6 +163,7 @@ var newsParser = {
 	getNews:function(start_time_string,end_time_string,callback){					
 		var me = this;		
 		this.getView('strdate',dateParser.convert(start_time_string),dateParser.convert(end_time_string),function(e){				
+			console.log(e);
 			if (e){
 				var results = {};					
 				if (e.rows.length > 0){

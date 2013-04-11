@@ -54,6 +54,7 @@ var rupu = function(){
 	// elements for rupu to use
 	this.panes = {	
 		left : $('<div id="left-pane" class="pane"></div>'),
+		leftList : $('<div id="left-pane-list" class="pane"></div>'),
 		right : $('<div id="right-pane" class="pane"></div>'),
 		main : $('<div id="main-pane" class="pane"></div>'),
 		main_scroller : $('<div id="main-pane-scroller"></div>'),
@@ -74,8 +75,6 @@ var rupu = function(){
 	this.pageScroll=false;	// page, item display scroller
 	this.mainPaneScroll=false;	// main pane, the tile display scroll
 	this.tools = {};		// toolbar
-	this.lastResizeTime=0;	// resize delay system, to be done.
-	this.resizeInterval=500;	
 	this._listeners =[]; // event listeners registered for rupu
 }
 rupu.prototype = {
@@ -93,6 +92,7 @@ rupu.prototype = {
 		this.tools = new toolbar('toolbar');
 		this.panes.container
 				.append(this.panes.left)
+				.append(this.panes.leftList)
 				.append(this.panes.main.append(this.panes.main_scroller.append(this.panes.main_content)))
 				.append(this.panes.right);
 		
@@ -190,12 +190,16 @@ rupu.prototype = {
 			return 'b';
 		}
 	},
+	getList:function(items){
+		var e = itemBuilder.getList(items);
+
+	},
 	// show category of items by category name
 	showItems:function(items){
 		var me = this;		
 		var types = newsParser.getTypeCount(items);
 		
-		console.log(types)
+		
 
 		var e = itemBuilder.build(items,{
 											b:'b',
@@ -334,11 +338,11 @@ rupu.prototype = {
 			var count = date.length;
 			for (var i in date){
 
-				newsParser.getNews(date[i],false,function(){
+				newsParser.getNews(date[i],false,function(news){
 					count--;
 					if (count == 0){
 						if (typeof(callback) == 'function'){
-							callback();
+							callback(news);
 						}						
 						me.setMenu();
 						me._fire('load');						
@@ -347,12 +351,16 @@ rupu.prototype = {
 			}
 
 
-		} else {
+		} else {			
 			newsParser.getNews(date,end_date,function(news){
 				if (news){
 					me.setMenu();
 					me._fire('load');
+
 				}
+				if (typeof(callback) == 'function'){
+					callback(news);
+				}						
 			});
 		}
 	},
