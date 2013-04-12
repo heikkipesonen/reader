@@ -64,27 +64,18 @@ var rupu = function(){
 	// elements for rupu to use
 	this.panes = {	
 		left : $('<div id="left-pane" class="pane"></div>'),
-		list : $('<div id="pane-list" class="pane"></div>'),
+		list : $('<div id="list-pane" class="pane"></div>'),
 		right : $('<div id="right-pane" class="pane"></div>'),
 		main : $('<div id="main-pane" class="pane"></div>'),
 		main_scroller : $('<div id="main-pane-scroller"></div>'),
 		main_content : $('<div id="main-pane-content"></div>'),
-		container : $('<div id="main"></div>'),
-		
-		opts:{
-			rightPane:[20,100], // pane dimensions in percent, width and height
-			leftPane:[90,100],
-			mainPane:[96,100],
-			rightPaneMax:300,	// maximum width in pixels
-			rightPaneMin:200,	// minimum width in pixels
-			leftPaneMax:900,	// for left pane
-			leftPaneMin:600
-		}
+		container : $('<div id="main"></div>')
 	}
 
-	this.mainScroll = false; // iscroll for main element, the horizontal scroller
-	this.pageScroll=false;	// page, item display scroller
-	this.mainPaneScroll=false;	// main pane, the tile display scroll
+	this.__mainScroll = false; // iscroll for main element, the horizontal scroller
+	this.__pageScroll=false;	// page, item display scroller
+	this.__mainPaneScroll=false;	// main pane, the tile display scroll
+	this._listScroll=false;
 	this.tools = {};		// toolbar
 	this._listeners =[]; // event listeners registered for rupu
 
@@ -94,6 +85,7 @@ var rupu = function(){
 						});
 
 	this._news = new itemStore();
+
 }
 rupu.prototype = {
 	// percentage values for window sizes
@@ -109,14 +101,16 @@ rupu.prototype = {
 		var me = this;
 		this.tools = new toolbar('toolbar');
 		this.panes.container
-				//.append(this.panes.left)
+				.append(this.panes.list)
+				.append(this.panes.left.append(this.panes.left_newscontainer))
 				//.append(this.panes.leftList)
 				.append(this.panes.main.append(this.panes.main_content))
 				//.append(this.panes.main_scroller.append(this.panes.main_content))
-				//.append(this.panes.right);
+				.append(this.panes.right);
 		
 
 		$(container).append(this.panes.container);
+		this._container = $(container);
 
 		this.panes.left.hammer().on('tap',function(){
 			me._showPane('main-pane');
@@ -126,9 +120,13 @@ rupu.prototype = {
 		this.panes.right.append( this.tools.getElement() );	
 		
 		this.scale();
-		//this.mainScroll = new iScroll($(container).attr('id'),this.mainSrollOpts);
 		this._showPane('main-pane',0);
 
+		this.on('load',function(){
+			me._sortItems();
+			me._setMenu();
+			me._createList();
+		})
 		this._fire('start');	
 
 		
@@ -142,7 +140,44 @@ rupu.prototype = {
 	},
 	// scale the elements according to screen size changes
 	scale:function() {		
+
+		this.panes.list.css({
+			top:0,
+			left:0
+		})
+
+		var leftWidth = window.innerWidth*0.5;
+		leftWidth = leftWidth < 700 ? 700 : leftWidth > 900 ? 900 : leftWidth;
+		
+
+		this.panes.left.css({
+			top:0,
+			left:this.panes.list.width(),
+			width:leftWidth
+		});
+
+		this.panes.main.css({
+			width:window.innerWidth,
+			left:this.panes.left.width()+this.panes.list.width(),
+			top:0
+		});
+
+		this.panes.right.css({
+			left:this.panes.left.width() + this.panes.main.width()+this.panes.list.width(),
+			top:0
+		});
+
+		this.panes.container.css({
+			width: this.panes.left.width() + this.panes.main.width() + this.panes.right.width()+this.panes.list.width()
+		});
+
+		if (this._mainScroll){
+			this._mainScroll.destroy();
+		}
+		this._mainScroll = new iScroll($(this._container).attr('id'),this.mainSrollOpts);
+
 		this._fire('scale');
+
 	},
 	_createList:function(){
 		var list = $('<ul></ul>'),
@@ -153,19 +188,22 @@ rupu.prototype = {
 			list.append( item.getListItem() );
 		});
 
-		list.find('li').hammer().on('tap',function(){
-			me.showItem($(this).attr('id'));
-		});
+		if (this._listScroll){
+			this._listScroll.destroy();
+		}
+		this._listScroll = new iScroll('list-pane',this.iscrollOpts)
 
-		this.panes.main.prepend(this.panes.list);
+		list.find('li').hammer().on('tap',function(){
+			me.showItem($(this).attr('id'),false);
+		});
 	},
-	// scroll to certain pane with mainscroll-horizontal scroll
+	// scroll to certain pane with _mainScroll-horizontal scroll
 	_showPane:function(id,time){
 		if (time==undefined){
 			time=300;
 		}
-		if (this.mainScroll){
-			this.mainScroll.scrollToElement('#'+id,time);
+		if (this._mainScroll){
+			this._mainScroll.scrollToElement('#'+id,time);
 			this._fire('showPane',id);
 		}
 	},
@@ -176,10 +214,6 @@ rupu.prototype = {
 		} else {
 			return 'b';
 		}
-	},
-	getList:function(items){
-		var e = itemBuilder.getList(items);
-
 	},
 	// show category of items by category name
 	showItems:function(items){
@@ -192,21 +226,26 @@ rupu.prototype = {
 		this._showAtPane(e);
 		this._fire('showItems',items);
 	},
+	showAll:function(){
+		this.showItems(this._news.getItems());
+		this._showPane('main-pane');
+	},
 	showCategory:function(cat){
 		this.tools.selectButton(cat);
 		var items = this._news.get('category',cat);
-		
 		this.showItems(items);
 		this._fire('categoryChange',cat);
 		this._showPane('main-pane');
 	},
 	// show news item in left pane display
-	showItem:function(id){
+	showItem:function(id,scrollTo){
 		var me = this;
 		var container = this.panes.left;
 		
 		if (container.find('[data-item="'+id+'"]').length > 0){
-			me._showPane('left-pane');
+			if (scrollTo!=false){
+				me._showPane('left-pane');
+			}
 		} else {
 			var e = this._news.find(id).getFull();
 
@@ -214,13 +253,17 @@ rupu.prototype = {
 				opacity:0,
 			},200,function(){
 				container.html(e);
-				me._showPane('left-pane');
-				if (me.pageScroll){
-					me.pageScroll.destroy();
+				
+				if (scrollTo!=false){
+					me._showPane('left-pane');
+				}
+
+				if (me._pageScroll){
+					me._pageScroll.destroy();
 				}
 
 				container.transit({opacity:1});
-				//me.pageScroll = new iScroll('page',this.iscrollOpts);
+				me._pageScroll = new iScroll('page',this.iscrollOpts);
 				me._fire('showItem',id);
 			});
 
@@ -241,6 +284,11 @@ rupu.prototype = {
 		
 
 			each(content,function(item){
+				item.hammer().on('tap',function(){
+
+					me.showItem($(this).attr('id'));
+				});
+
 				container.append(item);
 			});
 
@@ -248,11 +296,11 @@ rupu.prototype = {
 				animate:false,
 				callback:function(){
 
-					if (me.mainPaneScroll && me.mainPaneScroll!=undefined){
-						me.mainPaneScroll.destroy();
+					if (me._mainPaneScroll && me._mainPaneScroll!=undefined){
+						me._mainPaneScroll.destroy();
 					}
 
-					me.mainPaneScroll = new iScroll('main-pane',me.iscrollOpts);
+					me._mainPaneScroll = new iScroll('main-pane',me.iscrollOpts);
 
 					container.transit({
 						opacity:1
@@ -267,8 +315,7 @@ rupu.prototype = {
 	},
 	_setMenu:function(){
 		var me = this;
-		/*
-		var categories = newsParser.getCategories();
+		var categories = this._news.getKeys('category');
 		
 		me.tools.reset();
 
@@ -283,12 +330,14 @@ rupu.prototype = {
 			target:"menu"
 		});
 
+		console.log(categories)
 		each(categories,function(catg){
+				catg = catg.toLowerCase();
 				me.tools.addButton({
-						text:catg.name,
-						id:catg.name,
-						span:catg.items,
-						bg:colors[catg.name] || colors['defaultColor'],
+						text:catg,
+						id:catg,
+						span:me._news.get('category',catg).length,
+						bg:colors[catg] || colors['defaultColor'],
 						spancolor:[250,250,250,0.4],
 						action:function(id){
 							me.showCategory(id);
@@ -299,7 +348,6 @@ rupu.prototype = {
 
 		me.tools.scaleHeight();
 		me.scale();		
-		*/
 	},
 	_sortItems:function(){
 		this._news.sort(function(a,b){
@@ -313,27 +361,41 @@ rupu.prototype = {
 	getCategories:function(){
 		return this._news.getKeys('category');
 	},
-	getDate:function(date,end_date,callback){
+	getDate:function(date,end_date,callback,fire){
 		var me = this;
 		this._fire('loadstart');		
 		
-		this._db.getView({
-			startkey:dateParser.convert(date),
-			endkey:dateParser.convert(end_date),
-			view:'strdate',
-			callback:function(e){
-				for (var i in e){
-					me._news.add(new newsItem(e[i]));
-				}
+		if (date instanceof Array){
+			 var count = date.length;
+			 for (var i in date){
+			 	this.getDate(date[i],false,function(e){
+			 		count--;
+			 	},false);
 
-				me._sortItems();
-				if (typeof(callback) == 'function'){
-					callback(e);
-				}				
-				
-				me._fire('load',e);
-			}
-		});
+			 	if (count == 0){
+			 		this._fire('load');
+			 	}
+			 }
+		} else {
+			this._db.getView({
+				startkey:dateParser.convert(date),
+				endkey:dateParser.convert(end_date),
+				view:'strdate',
+				callback:function(e){
+					for (var i in e){
+						me._news.add(new newsItem(e[i]));
+					}
+
+					me._sortItems();
+					if (typeof(callback) == 'function'){
+						callback(e);
+					}				
+					if (fire != false){
+						me._fire('load',e);
+					}
+				}
+			});
+		}
 	},
 
 	on:function(name,fn){		

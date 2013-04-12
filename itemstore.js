@@ -6,11 +6,55 @@ itemStore.prototype = {
 	empty:function(){
 		this._items = [];
 	},
+	getItems:function(){
+		return this._items;
+	},
 	each:function(fn){	      
         for (var i in this._items){
             fn(this._items[i],i);
         }
-	},	
+	},
+	/*
+	getPrev:function(id){
+		var index = this.getIndex(id);
+		if (index){
+			if (this._items.length > index && this._items[index-1]){
+				return this._items[index-1];
+			} else if (this._items.length < index){
+				return this._items[0];
+			}
+		} else {
+			return false;
+		}
+	}
+	getNext:function(id){
+		var index = this.getIndex(id);
+		if (index){
+			if (this._items.length > index && this._items[index+1]){
+				return this._items[index+1];
+			} else if (this._items.length < index){
+				return this._items[0];
+			}
+		} else {
+			return false;
+		}
+	},
+	*/
+	getIndex:function(item){
+		var found = false;
+		for (var i in this._items){
+			if (typeof(item) == 'string'){
+				if (this._items[i]._id == item){
+					found = i;
+					break;
+				}
+			} else if (this._items[i] == item){
+				found = i;
+				break;
+			}
+		}
+		return found;
+	},
 	get:function(key,value){
 		var results = [];
 		if (typeof(value) == 'string'){

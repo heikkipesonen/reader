@@ -84,9 +84,11 @@ newsItem.prototype = {
 	getFull:function(){		
 		var item = this;
 		
-		var c = $('<div id="page" data-item="'+this._id+'" class="scale fullheight pagecontainer"></div>')
-		var scroll = $('<div id="page-scroll" class="page-scroll"></div>');
-		var e = $('<div class="news-page"></div>');
+		var c = $('<div id="page" data-item="'+this._id+'" class="scale fullheight pagecontainer"></div>'),
+			scroll = $('<div id="page-scroll" class="page-scroll"></div>'),
+			e = $('<div class="news-page"></div>');
+
+		e.append('<span style="background-color: '+colors.getColor(item.category)+'" class="category">'+this.category+'</span>')
 
 		if (this.content){
 			c.addClass('has-image');
