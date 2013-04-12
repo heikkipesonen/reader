@@ -11,21 +11,25 @@ newsItem.prototype = {
 		}	
 	},
 	getListItem:function(){		
-		var e = $('<li border-color:'+colors.getColor(this.category)+'" class="clickable smallListItem listItem"></li>');
+		var e = $('<li class="clickable smallListItem listItem"></li>');
 		e.attr('id',this._id);
-		e.attr('this-action','showItem');
-		e.attr('this-target',this._id);
 
 		if (this.content){
 			if (this.content.length > 0){
-				e.append('<div class="list-img-container"><img src="'+IMG_URL +'thumb/'+ this.content[0].name+'" class="small-image"/></div>');
+				e.append('<img src="'+IMG_URL +'thumb/'+ this.content[0].name+'" class="small-image"/>');
 				e.addClass('has-image');
+			} else {
+				e.addClass('no-image');
 			}
+		}else {
+			e.addClass('no-image');
 		}
-		var c = $('<div class="textcontainer"></div>');
+		//var c = $('<div class="textcontainer"></div>');
 
-		c.append('<h4>'+this.title+'</h4>');
-		//e.append('<span>'+getItemDate(this.pubdate)+'</span>')
+		var c = $('<h4 style="color:'+colors.getColor(this.category,1)+'">'+this.title+'</h4>');
+
+		e.append('<span class="pubdate">'+getItemDate(this.pubdate)+'</span>');
+		e.append('<span class="category">'+this.category+'</span>')
 
 		e.append(c);
 
@@ -127,15 +131,19 @@ newsItem.prototype = {
 		return c; 
 		
 	},
-	getShortText:function(item){
+	getShortText:function(len){
 		var t = $(this.text);
 		
+		if (len == undefined){
+			len = 100;
+		}
+
 		if ( $(t[1]).text().length < 70){ // tekijän nimi yleensä
-			var txt = $(t[1]).text() + $(t[2]).text().substr(0,100) + '...';
+			var txt = $(t[1]).text() + $(t[2]).text().substr(0,len) + '...';
 			$(t[2]).text(txt);
 			return $(t[2]).text();
 		} else {
-			var txt = $(t[1]).text().substr(0,100) + '...';
+			var txt = $(t[1]).text().substr(0,len) + '...';
 			$(t[1]).text(txt);
 			
 			return $(t[1]).text();

@@ -55,3 +55,36 @@ function each(arr,fn){
         fn(arr,0);
     }
 }
+
+
+var dateParser = {
+    strangeDate:{
+        getMonth:function(dateString){
+            return dateString.split('.')[2];
+        },
+        getYear:function(dateString){
+            return dateString.split('.')[1];    
+        },
+        getDay:function(dateString){
+            return dateString.split('.')[0];    
+        }
+    },
+
+    getYear:function(dateString){
+        return dateString.split('.')[2];
+    },
+    getMonth:function(dateString){
+        return dateString.split('.')[1];
+    },
+    getDay:function(dateString){
+        return dateString.split('.')[0];
+    },
+
+    convert:function(strangeDate){
+        if (strangeDate){
+            return strangeDate.split('.')[2] +'.'+ strangeDate.split('.')[1] +'.'+strangeDate.split('.')[0];
+        } else {
+            return strangeDate;
+        }
+    }
+}

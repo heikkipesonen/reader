@@ -64,7 +64,7 @@ var rupu = function(){
 	// elements for rupu to use
 	this.panes = {	
 		left : $('<div id="left-pane" class="pane"></div>'),
-		leftList : $('<div id="left-pane-list" class="pane"></div>'),
+		list : $('<div id="pane-list" class="pane"></div>'),
 		right : $('<div id="right-pane" class="pane"></div>'),
 		main : $('<div id="main-pane" class="pane"></div>'),
 		main_scroller : $('<div id="main-pane-scroller"></div>'),
@@ -109,10 +109,11 @@ rupu.prototype = {
 		var me = this;
 		this.tools = new toolbar('toolbar');
 		this.panes.container
-				.append(this.panes.left)
-				.append(this.panes.leftList)
-				.append(this.panes.main.append(this.panes.main_scroller.append(this.panes.main_content)))
-				.append(this.panes.right);
+				//.append(this.panes.left)
+				//.append(this.panes.leftList)
+				.append(this.panes.main.append(this.panes.main_content))
+				//.append(this.panes.main_scroller.append(this.panes.main_content))
+				//.append(this.panes.right);
 		
 
 		$(container).append(this.panes.container);
@@ -124,18 +125,39 @@ rupu.prototype = {
 		this.tools.setSize(['100%','100%'])
 		this.panes.right.append( this.tools.getElement() );	
 		
-		this.mainScroll = new iScroll($(container).attr('id'),this.mainSrollOpts);
+		this.scale();
+		//this.mainScroll = new iScroll($(container).attr('id'),this.mainSrollOpts);
 		this._showPane('main-pane',0);
 
 		this._fire('start');	
 
+		
+		
+
+		/*
 		this._db.getDates(function(e){
 			console.log(e);
-		})
+		});
+		*/
 	},
 	// scale the elements according to screen size changes
 	scale:function() {		
 		this._fire('scale');
+	},
+	_createList:function(){
+		var list = $('<ul></ul>'),
+			me = this;
+
+		this.panes.list.append(list);
+		this._news.each(function(item){
+			list.append( item.getListItem() );
+		});
+
+		list.find('li').hammer().on('tap',function(){
+			me.showItem($(this).attr('id'));
+		});
+
+		this.panes.main.prepend(this.panes.list);
 	},
 	// scroll to certain pane with mainscroll-horizontal scroll
 	_showPane:function(id,time){
@@ -186,7 +208,7 @@ rupu.prototype = {
 		if (container.find('[data-item="'+id+'"]').length > 0){
 			me._showPane('left-pane');
 		} else {
-			//var e = itemBuilder.fullView(id);
+			var e = this._news.find(id).getFull();
 
 			container.transit({
 				opacity:0,
@@ -198,7 +220,7 @@ rupu.prototype = {
 				}
 
 				container.transit({opacity:1});
-				me.pageScroll = new iScroll('page',this.iscrollOpts);
+				//me.pageScroll = new iScroll('page',this.iscrollOpts);
 				me._fire('showItem',id);
 			});
 
@@ -279,6 +301,15 @@ rupu.prototype = {
 		me.scale();		
 		*/
 	},
+	_sortItems:function(){
+		this._news.sort(function(a,b){
+			if (a.category > b.category){
+				return 1;
+			} else {
+				return -1;
+			}
+		});
+	},
 	getCategories:function(){
 		return this._news.getKeys('category');
 	},
@@ -291,14 +322,15 @@ rupu.prototype = {
 			endkey:dateParser.convert(end_date),
 			view:'strdate',
 			callback:function(e){
-
 				for (var i in e){
 					me._news.add(new newsItem(e[i]));
 				}
 
+				me._sortItems();
 				if (typeof(callback) == 'function'){
 					callback(e);
 				}				
+				
 				me._fire('load',e);
 			}
 		});

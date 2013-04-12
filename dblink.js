@@ -1,7 +1,7 @@
 function dblink(opts){
 	
 	this._options = {
-
+		retries:5
 	}
 
 	for (var i in opts){
@@ -103,47 +103,25 @@ dblink.prototype = {
 		if (designDocument == undefined){
 			designDocument = this._options.designDocument;
 		}
-		console.log(this._options.url + '/_design/'+designDocument+'/_view/'+opts.view + keys)
-		$.getJSON(this._options.url + '/_design/'+designDocument+'/_view/'+opts.view + keys,function(e){			
-			
-			if (opts.parse){	
-				opts.callback(me.parseResults(e));
-			} else {
-				opts.callback(e);			
+
+		this.get(this._options.url + '/_design/'+designDocument+'/_view/'+opts.view + keys,function(e){
+			if (e){			
+				if (opts.parse){	
+					opts.callback(me.parseResults(e));
+				} else {
+					opts.callback(e);			
+				}
 			}
-
 		});
-	},
-}
 
-var dateParser = {
-	strangeDate:{
-		getMonth:function(dateString){
-			return dateString.split('.')[2];
-		},
-		getYear:function(dateString){
-			return dateString.split('.')[1];	
-		},
-		getDay:function(dateString){
-			return dateString.split('.')[0];	
-		}
 	},
-
-	getYear:function(dateString){
-		return dateString.split('.')[2];
-	},
-	getMonth:function(dateString){
-		return dateString.split('.')[1];
-	},
-	getDay:function(dateString){
-		return dateString.split('.')[0];
-	},
-
-	convert:function(strangeDate){
-		if (strangeDate){
-			return strangeDate.split('.')[2] +'.'+ strangeDate.split('.')[1] +'.'+strangeDate.split('.')[0];
-		} else {
-			return strangeDate;
+	get:function(url,callback){
+		try{			
+			$.getJSON(url,function(e){			
+				callback(e);
+			});
+		} catch (e){			
+			callback(false);
 		}
 	}
 }
