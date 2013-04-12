@@ -50,12 +50,14 @@
 			var rp = new rupu();
 			rp.start('#wrapper');
 			
-			rp.getDate('10.04.2013',false,function(e){
-				console.log(e);
+			rp.getDate('11.04.2013',false,function(e){
+				console.log(e.length);
+
 			})
 
 			rp.on('load',function(){
 				
+				rp.showCategory('etusivu');
 				
 			});
 /*

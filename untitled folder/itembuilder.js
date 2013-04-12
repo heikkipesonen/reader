@@ -1,16 +1,12 @@
 function newsItem(data){
-	if (data){
-		this.load(data);
-	}
+	for (var i in data){
+		this[i] = data[i];
+	}	
 }
 
 newsItem.prototype = {
-	load:function(data){
-		for (var i in data){
-			this[i] = data[i];
-		}	
-	},
-	getListItem:function(){		
+	getListItem:function(){
+		
 		var e = $('<li border-color:'+colors.getColor(this.category)+'" class="clickable smallListItem listItem"></li>');
 		e.attr('id',this._id);
 		e.attr('this-action','showItem');
@@ -31,7 +27,7 @@ newsItem.prototype = {
 
 		return e;
 	},
-	getTile:function(){
+	getNewsItem:function(){
 		var data = this._data;
 		var e = $('<div class="clickable item tile bigItem" data-action="showItem"  data-target="'+this._id+'"></div>');
 
@@ -70,21 +66,24 @@ newsItem.prototype = {
 					.append('<h2>'+this.title+'</h2>')
 					.append('<span class="date">'+getItemDate(this.pubdate)+'</span>')
 					.append('<span style="background-color:'+colors.getColor(this.category)+'"class="wide category">'+this.category+'</span>')
-					.append('<div class="textcontainer"><p>'+this.getShortText(data)+'</p></div>');
+					.append('<div class="textcontainer"><p>'+newsParser.shortenText(data)+'</p></div>');
 
 		}
 
 
 		return e;		
 	},
-	getFull:function(){		
-		var item = this;
+	getFull:function(){	
+		var data = this._data;		
+		var item = newsParser.getItem(id);
+		var size = newsParser.testSize(item);
+
+		var c = $('<div id="page" data-item="'+id+'" class="scale fullheight pagecontainer"></div>')
 		
-		var c = $('<div id="page" data-item="'+this._id+'" class="scale fullheight pagecontainer"></div>')
 		var scroll = $('<div id="page-scroll" class="page-scroll"></div>');
 		var e = $('<div class="news-page"></div>');
 
-		if (this.content){
+		if (size == 'b'){
 			c.addClass('has-image');
 			var imgCont = $('<div class="imagecontainer"></div>');
 			
@@ -126,19 +125,5 @@ newsItem.prototype = {
 
 		return c; 
 		
-	},
-	getShortText:function(item){
-		var t = $(this.text);
-		
-		if ( $(t[1]).text().length < 70){ // tekijän nimi yleensä
-			var txt = $(t[1]).text() + $(t[2]).text().substr(0,100) + '...';
-			$(t[2]).text(txt);
-			return $(t[2]).text();
-		} else {
-			var txt = $(t[1]).text().substr(0,100) + '...';
-			$(t[1]).text(txt);
-			
-			return $(t[1]).text();
-		}		
 	}
 }

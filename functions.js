@@ -47,7 +47,11 @@ function getItemDate(timestamp){
 }
 
 function each(arr,fn){
-    for (var i in arr){
-        fn(arr[i],i);
+    if (arr instanceof Array){    
+        for (var i in arr){
+            fn(arr[i],i);
+        }
+    } else {
+        fn(arr,0);
     }
 }

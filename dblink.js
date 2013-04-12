@@ -1,8 +1,7 @@
 function dblink(opts){
 	
 	this._options = {
-		url:'http://cdb.ereading.metropolia.fi/reader',
-		designDocument:'news'
+
 	}
 
 	for (var i in opts){
@@ -22,7 +21,32 @@ dblink.prototype = {
 			}
 		}
 		return results;
-	},	
+	},
+	getDates:function(callback){
+		/*
+			get all dates from the database
+			returns array
+
+			[{date:'dd.mm.yyyy',count:numberOfNews}]
+
+		*/
+		this.getView({
+			view:'dates',
+			reduce:1,
+			parse:false,
+			callback:function(e){
+				var results = [];
+				for (var i in e.rows){
+					results.push({
+						date:dateParser.convert(e.rows[i].key),
+						count:e.rows[i].value
+					});
+				}
+				callback(results);
+			}
+		});
+
+	},
 	getView:function(opts){
 		/*
 			get view from couchdb
@@ -31,6 +55,7 @@ dblink.prototype = {
 				startkey:String
 				endkey:String
 				reduce:groupLevel as int
+				limit:how many results should the database emit
 				designDocument: string name of the design view
 				parse: if return the raw result
 			}
@@ -47,7 +72,7 @@ dblink.prototype = {
 		}
 		if (opts.startkey && opts.endkey){
 			keys += 'startkey="'+opts.startkey+'"';
-		} else if (!opts.endkey){
+		} else if (!opts.endkey && opts.startkey){
 			keys += 'key="'+opts.startkey+'"';
 		}
 
@@ -62,8 +87,18 @@ dblink.prototype = {
 			if (opts.reduce == true){
 				opts.reduce =1;
 			}
-			keys += '&grouplevel='+opts.reduce;
+			if (keys != ''){
+				keys += '&';
+			} else {
+				keys = '?';
+			}
+			keys += 'group_level='+opts.reduce;
 		}
+
+		if (opts.limit){
+			keys += '&limit='+opts.limit;
+		}
+
 		var designDocument = opts.designDocument;
 		if (designDocument == undefined){
 			designDocument = this._options.designDocument;

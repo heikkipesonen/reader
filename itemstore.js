@@ -3,6 +3,14 @@ function itemStore(){
 	this._listeners = [];
 }
 itemStore.prototype = {
+	empty:function(){
+		this._items = [];
+	},
+	each:function(fn){	      
+        for (var i in this._items){
+            fn(this._items[i],i);
+        }
+	},	
 	get:function(key,value){
 		var results = [];
 		if (typeof(value) == 'string'){
@@ -24,6 +32,27 @@ itemStore.prototype = {
 	sort:function(sort){
 		this._items.sort(sort);
 		return this._items;
+	},
+	isInArray:function(array,value){
+	    var found =false;
+	    for (var i in array){
+	        if (array[i] == value){
+	            found = true;
+	        }
+	    }
+	    return found;
+	},
+	getKeys:function(key){
+		var result = [];
+		for (var i in this._items){
+			if (this._items[i][key]){		
+				if (!this.isInArray(result,this._items[i][key])){
+					result.push(this._items[i][key]);
+				}
+			}
+		}
+
+		return result;
 	},
 	count:function(){
 		return this._items.length;
@@ -74,7 +103,6 @@ itemStore.prototype = {
 			this._fire('additem',data);
 		}
 	},
-
 	on:function(name,fn){		
 		if (this._listeners[name] == undefined){
 			this._listeners[name] = Array();
