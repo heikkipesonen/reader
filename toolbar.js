@@ -169,9 +169,10 @@ toolbar.prototype = {
 		},
 		setScroll:function(){
 			if (this._scroller){
-				this._scroller.destroy();
+				this._scroller.refresh();
+			} else {
+				this._scroller = new iScroll(this._element.container.attr('id'),{hScrollbar:false,vScrollbar:false});
 			}
-			this._scroller = new iScroll(this._element.container.attr('id'),{hScrollbar:false,vScrollbar:false});
 		},
 		setWidth:function(w){
 			this._element.container.css('width',w);

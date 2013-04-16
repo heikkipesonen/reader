@@ -13,8 +13,7 @@ itemStore.prototype = {
         for (var i in this._items){
             fn(this._items[i],i);
         }
-	},
-	/*
+	},	
 	getPrev:function(id){
 		var index = this.getIndex(id);
 		if (index){
@@ -26,7 +25,7 @@ itemStore.prototype = {
 		} else {
 			return false;
 		}
-	}
+	},
 	getNext:function(id){
 		var index = this.getIndex(id);
 		if (index){
@@ -38,8 +37,7 @@ itemStore.prototype = {
 		} else {
 			return false;
 		}
-	},
-	*/
+	},	
 	getIndex:function(item){
 		var found = false;
 		for (var i in this._items){
@@ -119,23 +117,22 @@ itemStore.prototype = {
 		return found;
 	},
 	remove:function(key,value){
-		var found = false;
+		var result = [];
+
 		for (var i in this._items){				
 			if (!value){			
 				if (this._items[i]._id == key){
+					result.push(this._items[i]);
 					delete this._items[i];
-					found =true;
-					break;
 				}
 			} else if (this._items[i][value]){
 				if (this._items[i][value] == value){
+					result.push(this._items[i]);
 					delete this._items[i];
-					found = true;
-					break;
 				}
 			}
 		}
-		return found;		
+		return result;		
 	},
 	add:function(data){
 		if (data instanceof Array){

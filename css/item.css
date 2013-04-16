@@ -1,5 +1,6 @@
 .item.tile{
-	margin-left: -1px;
+	margin: -1px;
+	border-bottom: 2px dashed #999;
 }
 
 .item.tile.has-image h2{
@@ -30,13 +31,13 @@
 
 .item.tile .img-container{
 	position: relative;
-	width: 100%;
+	width: 95%;
+	margin: 2.5%;
 	overflow: hidden;
 }
 
 .item.tile .img-container img{
-	width: 100%;
-	
+	width: 100%;	
 }
 
 .item.tile .date{

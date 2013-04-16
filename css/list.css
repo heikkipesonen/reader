@@ -1,18 +1,19 @@
-#pane-list{
-	min-height:100%;
+#list-pane{
+	position: absolute;
+	height:100%;
 	width: 25%;
-	min-width: 300px;
+	min-width: 350px;
 	max-width: 400px;
 
 	border-right: 8px solid #444; 
 }
 
-#pane-list ul{
+#list-pane ul{
 	position: relative;
 	counter-reset: listcounter;
 }
 
-#pane-list ul li{
+#list-pane ul li{
 	counter-increment: listcounter;
 	position: relative;
 	height: 72px;
@@ -20,16 +21,16 @@
 	overflow: hidden;
 }
 
-#pane-list ul li:hover{
+#list-pane ul li:hover{
 	background-color: rgba(69,201,244,0.8);
 }
 
-#pane-list ul img{
+#list-pane ul img{
 	max-height: 100%;
 	float: left;
 }
 
-#pane-list ul li h4{
+#list-pane ul li h4{
 	max-width: 66%;
 	font-size: 12pt;
 	font-weight: bold;
@@ -39,31 +40,31 @@
 	word-wrap: break-word;
 }
 
-#pane-list ul li span{
+#list-pane ul li span{
 	font-size: 8pt;
 	color: #666;
 	position: absolute;
 }
 
-#pane-list ul li span.category{
+#list-pane ul li span.category{
 	top: 0px;
 	right: 0px;
 	padding: 10px;
 
 }
 
-#pane-list ul li span.pubdate{
+#list-pane ul li span.pubdate{
 	bottom: 0px;
 	right: 0px;
 	padding: 10px;
 }
 
-#pane-list ul li.no-image h4{
+#list-pane ul li.no-image h4{
 	margin-left: 87px;
 }
 
 
-#pane-list ul li.no-image:before{
+#list-pane ul li.no-image:before{
 	position: absolute;
 	content: counter(listcounter);
 	font-size: 72pt;

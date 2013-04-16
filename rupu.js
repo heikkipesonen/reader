@@ -69,15 +69,17 @@ var rupu = function(){
 		main : $('<div id="main-pane" class="pane"></div>'),
 		main_scroller : $('<div id="main-pane-scroller"></div>'),
 		main_content : $('<div id="main-pane-content"></div>'),
-		container : $('<div id="main"></div>')
+		container : $('<div id="main"></div>'),
+		menu:$('<div id="date-menu" class="pane"></div>')
 	}
 
-	this.__mainScroll = false; // iscroll for main element, the horizontal scroller
-	this.__pageScroll=false;	// page, item display scroller
-	this.__mainPaneScroll=false;	// main pane, the tile display scroll
+	this._mainScroll = false; // iscroll for main element, the horizontal scroller
+	this._pageScroll=false;	// page, item display scroller
+	this._mainPaneScroll=false;	// main pane, the tile display scroll
 	this._listScroll=false;
 	this.tools = {};		// toolbar
 	this._listeners =[]; // event listeners registered for rupu
+	this._dates = [];
 
 	this._db = new dblink({
 							url:'http://cdb.ereading.metropolia.fi/reader',
@@ -88,13 +90,6 @@ var rupu = function(){
 
 }
 rupu.prototype = {
-	// percentage values for window sizes
-	_getWidth:function(pc){
-		return pc[0]* (window.innerWidth/100)
-	},
-	_getHeight:function(pc){
-		return pc[1]* (window.innerHeight/100)
-	},
 	// start rupu
 	// container is the element for rupu run in
 	start:function(container){
@@ -110,6 +105,8 @@ rupu.prototype = {
 		
 
 		$(container).append(this.panes.container);
+		$(container).append(this.panes.menu);
+
 		this._container = $(container);
 
 		this.panes.left.hammer().on('tap',function(){
@@ -122,22 +119,119 @@ rupu.prototype = {
 		this.scale();
 		this._showPane('main-pane',0);
 
-		this.on('load',function(){
-			me._sortItems();
-			me._setMenu();
-			me._createList();
-		})
+		this._setMenu();
 		this._fire('start');	
 
 		
-		
+		$(window).resize(function(){
+			me.scale();
+		})
 
 		/*
 		this._db.getDates(function(e){
 			console.log(e);
 		});
 		*/
+	},	
+	error:function(e){
+		console.log(e);
 	},
+	_getDatesMenu:function(callback){
+		var me = this;
+		this._db.getDates(function(dates){
+			me._buildDateMenu(dates);
+
+			if (typeof(callback) == 'function'){
+				callback(me._dateMenu);
+			}
+		});
+	},
+	_buildDateMenu:function(list){
+		var me = this;
+
+		each(list,function(item){
+			item._id = item.date;
+			item.largetext = item.date;
+			item.smalltext = item.count;
+		});
+
+
+		var gm = new gridMenu('menu');
+		gm.addButton({
+			largetext:'ok',
+			smalltext:'accept selection',
+			_id:'return'
+		});
+		gm.addButton({
+			largetext:'clear',
+			smalltext:'deselect',
+			_id:'deselect'
+		});				
+
+		gm.addButton(list);
+		gm.setSize(window.innerWidth,window.innerHeight);
+		gm.setOption('selectMany',true);
+		
+		gm.eachButton(function(btn){
+			btn.setBackgroundColor( bg[ dateParser.getMonth(btn.getId()) ] || bg.default);
+		});
+
+		gm.on('click',function(id,btn){
+			if (id=='return'){
+													
+				me.getDate( gm.getSelectedId() ,false);
+				me.hideDateMenu();
+				
+			} else if (id=='deselect'){
+				gm.clear();
+			} else {						
+				gm.toggleButton(btn);
+			}
+		});		
+
+
+		this._dateMenu = gm;
+		this.panes.menu.html( gm.getElement() );
+	},
+	showDateMenu:function(){
+		var me = this;
+		if (this._dateMenu){
+			this.panes.menu.css({
+				opacity:0,
+				display:'block'
+			})
+			this.panes.menu.transit({
+				opacity:1
+			},500,function(){
+				me._fire('showDateMenu');
+			});
+
+		} else {
+			this._getDatesMenu(function(){
+				me.showDateMenu();
+			});
+		}
+	},
+	hideDateMenu:function(){
+		var me = this;
+		this.panes.menu.transit({
+			opacity:0
+		},function(){
+			me.panes.menu.css({
+				display:'none'
+			});
+
+			me._fire('hideDateMenu');
+		})
+	},
+	// percentage values for window sizes
+	_getWidth:function(pc){
+		return pc[0]* (window.innerWidth/100)
+	},
+	_getHeight:function(pc){
+		return pc[1]* (window.innerHeight/100)
+	},
+
 	// scale the elements according to screen size changes
 	scale:function() {		
 
@@ -171,31 +265,44 @@ rupu.prototype = {
 			width: this.panes.left.width() + this.panes.main.width() + this.panes.right.width()+this.panes.list.width()
 		});
 
-		if (this._mainScroll){
-			this._mainScroll.destroy();
+		try{
+			if (this._mainScroll){
+				this._mainScroll.refresh();
+			} else {
+				this._mainScroll = new iScroll($(this._container).attr('id'),this.mainSrollOpts);				
+			}
+
+		} catch (e){
+			this.error(e);
 		}
-		this._mainScroll = new iScroll($(this._container).attr('id'),this.mainSrollOpts);
 
 		this._fire('scale');
 
 	},
 	_createList:function(){
-		var list = $('<ul></ul>'),
-			me = this;
+		try{
 
-		this.panes.list.append(list);
-		this._news.each(function(item){
-			list.append( item.getListItem() );
-		});
+			var list = $('<ul></ul>'),
+				me = this;
 
-		if (this._listScroll){
-			this._listScroll.destroy();
+			this.panes.list.html(list);
+
+			this._news.each(function(item){
+				list.append( item.getListItem() );
+			});
+
+			if (this._listScroll){
+				this._listScroll.destroy();
+			}
+
+			this._listScroll = new iScroll('list-pane',this.iscrollOpts)
+
+			list.find('li').hammer().on('tap',function(){
+				me.showItem($(this).attr('id'),false);
+			});
+		} catch (e){
+			this.error(e);
 		}
-		this._listScroll = new iScroll('list-pane',this.iscrollOpts)
-
-		list.find('li').hammer().on('tap',function(){
-			me.showItem($(this).attr('id'),false);
-		});
 	},
 	// scroll to certain pane with _mainScroll-horizontal scroll
 	_showPane:function(id,time){
@@ -217,12 +324,15 @@ rupu.prototype = {
 	},
 	// show category of items by category name
 	showItems:function(items){
-		var me = this;		
-		//var types = newsParser.getTypeCount(items);
+		var me = this;				
 		var e = [];
+
+		
 		each(items,function(item){
 			e.push(item.getTile());
 		});
+		
+
 		this._showAtPane(e);
 		this._fire('showItems',items);
 	},
@@ -297,10 +407,11 @@ rupu.prototype = {
 				callback:function(){
 
 					if (me._mainPaneScroll && me._mainPaneScroll!=undefined){
-						me._mainPaneScroll.destroy();
+						me._mainPaneScroll.refresh();
+					} else {
+						me._mainPaneScroll = new iScroll('main-pane',me.iscrollOpts);						
 					}
 
-					me._mainPaneScroll = new iScroll('main-pane',me.iscrollOpts);
 
 					container.transit({
 						opacity:1
@@ -325,12 +436,12 @@ rupu.prototype = {
 			bg:colors['defaultColor'],
 			spancolor:[250,250,250,0.4],
 			action:function(id){
-				console.log(id);
+				me.showDateMenu();
 			},
 			target:"menu"
 		});
 
-		console.log(categories)
+		
 		each(categories,function(catg){
 				catg = catg.toLowerCase();
 				me.tools.addButton({
@@ -361,6 +472,26 @@ rupu.prototype = {
 	getCategories:function(){
 		return this._news.getKeys('category');
 	},
+	_hasDate:function(date){
+		var found = false;
+		for (var i in this._dates){
+			if (this._dates[i] == date){
+				found = true;
+			}
+		}
+		return found;
+	},
+	_addNews:function(items){		
+		for (var i in items){
+			this._news.add(new newsItem(items[i]));
+		}
+		this._setMenu();
+		this._sortItems();
+		this._createList();
+	},
+	loadDatesSet:function(dates){
+
+	},
 	getDate:function(date,end_date,callback,fire){
 		var me = this;
 		this._fire('loadstart');		
@@ -376,17 +507,16 @@ rupu.prototype = {
 			 		this._fire('load');
 			 	}
 			 }
-		} else {
+		} else if (!this._hasDate(date)){
+
+			this._dates.push(date);
+
 			this._db.getView({
 				startkey:dateParser.convert(date),
 				endkey:dateParser.convert(end_date),
 				view:'strdate',
 				callback:function(e){
-					for (var i in e){
-						me._news.add(new newsItem(e[i]));
-					}
-
-					me._sortItems();
+					me._addNews(e);
 					if (typeof(callback) == 'function'){
 						callback(e);
 					}				

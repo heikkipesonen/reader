@@ -37,11 +37,24 @@ dblink.prototype = {
 			callback:function(e){
 				var results = [];
 				for (var i in e.rows){
+					
 					results.push({
+						sort:e.rows[i].key,
 						date:dateParser.convert(e.rows[i].key),
 						count:e.rows[i].value
 					});
 				}
+
+				results.sort(function(a,b){					
+					if (a.sort > b.sort){
+						return -1;
+					} else if (a.sort < b.sort){
+						return 1;
+					} else {
+						return 0;
+					}
+				});
+
 				callback(results);
 			}
 		});

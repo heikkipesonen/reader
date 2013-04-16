@@ -24,6 +24,15 @@
 	font-size: 30pt;
 }
 
+#page span.category{
+	padding: 20px;
+	font-size: 20pt;
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	color: #fff;
+	z-index: 10;
+}
 
 #page.has-image .news-page h1{
 	max-width: 80%;

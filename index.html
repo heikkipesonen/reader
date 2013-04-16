@@ -19,6 +19,7 @@
 		<script type="text/javascript" src="functions.js"></script>
 		<script type="text/javascript" src="toolbar.js"></script>
 		<script type="text/javascript" src="gridmenu.js"></script>
+		<script type="text/javascript" src="newsblock.js"></script>
 		
 		<script type="text/javascript" src="rupu.js"></script>
 		<script type="text/javascript"> var browser=true;</script>
@@ -51,68 +52,13 @@
 			var rp = new rupu();
 			rp.start('#wrapper');
 			
-			rp.getDate('11.04.2013',false,function(e){
-				console.log(e.length);
-
-			})
-
-
-			//rp.getDate(['06.03.2013','05.03.2013','04.03.2013']);
 
 			rp.on('load',function(){
-				
-				//rp.showCategory('etusivu');
+
 				rp.showAll();
-			});
-/*
-			rp.getDatesList(function(list){					
-				rp.getNews(list[0].date,false);
-				each(list,function(item){
-					item._id = item.date;
-					item.largetext = item.date;
-					item.smalltext = item.count;
-				});
-
-				var gm = new gridMenu('date-menu');
-				$('body').prepend(gm.getElement());
-
-				gm.addButton({
-					largetext:'ok',
-					smalltext:'accept selection',
-					_id:'return'
-				});
-				gm.addButton({
-					largetext:'clear',
-					smalltext:'deselect',
-					_id:'deselect'
-				});				
-
-				gm.addButton(list);
-				gm.setSize(window.innerWidth,window.innerHeight);
-				gm.setOption('selectMany',true);
-
-				
-				gm.eachButton(function(btn){
-					btn.setBackgroundColor( bg[ dateParser.getMonth(btn.getId()) ] || bg.default);
-				});
-
-				gm.on('click',function(id,btn){
-					if (id=='return'){
-															
-						rp.getNews( gm.getSelectedId() ,false);
-
-						gm.getElement().remove();
-						
-					} else if (id=='deselect'){
-						gm.clear();
-					} else {						
-						gm.toggleButton(btn);
-					}
-				});
 
 				
 			});
-		*/
 		});
 	}
 

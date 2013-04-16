@@ -1,10 +1,7 @@
-#main-container{
-	
-	-webkit-user-select:none;
+#toolbar{
+	position: absolute;
+	top:0px;
 }
-
-
-
 #toolbar_scroll #toolbar{
 	min-width: 100%;
 }
@@ -20,15 +17,15 @@
 #toolbar .toolbar-button.selected:before{
 	content:" ";
 	position: absolute;
-	left: -64px;
+	left: 0px;
 	border-left: 64px solid #fff;
 	border-top:64px solid transparent;
 	border-bottom:64px solid transparent;
 }
 
 #toolbar .toolbar-button-container{
-	width: 80%;
-	margin-left: 20%;
+	width: 100%;
+	margin-left: 0%;
 	position: relative;
 }
 
