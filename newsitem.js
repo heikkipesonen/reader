@@ -71,10 +71,13 @@ newsItem.prototype = {
 				
 				e
 					.addClass('no-image')
-					.append('<h2>'+this.title+'</h2>')
-					.append('<span class="date">'+getItemDate(this.pubdate)+'</span>')
 					.append('<span style="background-color:'+colors.getColor(this.category)+'"class="wide category">'+this.category+'</span>')
-					.append('<div class="textcontainer"><p>'+this.getShortText(data)+'</p></div>');
+					.append('<span class="date">'+getItemDate(this.pubdate)+'</span>')
+					.append( $('<div class="content"></div>')
+					.append('<h2>'+this.title+'</h2>')
+					.append('<div class="textcontainer"><p>'+this.getShortText(data)+'</p></div>')
+
+					);
 
 		}
 

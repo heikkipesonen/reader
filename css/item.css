@@ -1,6 +1,6 @@
 .item.tile{
-	margin: -1px;
-	border-bottom: 2px dashed #999;
+	
+	
 }
 
 .item.tile.has-image h2{
@@ -37,7 +37,7 @@
 }
 
 .item.tile .img-container img{
-	width: 100%;	
+	width: 100%;		
 }
 
 .item.tile .date{
@@ -63,27 +63,39 @@
 	background-color: #fff;
 }
 
+.item.tile .content{
+	padding: 2%;
+	width: 86%;
+	position: relative;	
+	border: 1px solid #ddd;
+	margin: 42px 5% 5% 5%;
+}
+
 .item.tile.no-image h2{
 	position: relative;
 	color: #000;
-	font-size: 20pt;
-	padding-top: 20px;
-	width: 80%;
+	font-size: 20pt;	
+	margin: 10px;
+	width: 100%;
 	word-wrap: break-word;
-	margin: 10%;
 }
 
 .item.tile.no-image .textcontainer{
-	width: 80%;
-	margin: 10%;
-	
+	width: 96%;	
+	text-align: justify;
+	color: #777;
+	margin: 2%;
 }
 
 
 .item.tile{
 	margin:-0.25px;
 	position: relative;
-	width: 50%;
+	width: 49%;
+}
+
+.item.tile.has-image{
+	width: 49%;
 }
 
 .small-items-list{
@@ -97,9 +109,6 @@
 }
 
 
-.item.tile.has-image{
-	width: 50%;
-}
 
 .item.tile.has-image.important{
 	width: 100%;
