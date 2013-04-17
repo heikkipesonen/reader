@@ -1,6 +1,8 @@
 #toolbar{
 	position: absolute;
 	top:0px;
+	-webkit-box-shadow: inset  0px 0px 50px rgba(0, 0, 0, 1);        
+    box-shadow: inset  0px 0px 50px rgba(0, 0, 0, 1);
 }
 #toolbar_scroll #toolbar{
 	min-width: 100%;
@@ -24,8 +26,8 @@
 }
 
 #toolbar .toolbar-button-container{
-	width: 100%;
-	margin-left: 0%;
+	width: 80%;
+	margin-left: 10%;
 	position: relative;
 }
 

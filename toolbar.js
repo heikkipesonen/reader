@@ -119,8 +119,8 @@ toolbar.prototype = {
 			this.buttons(function(btn){
 				if (btn._id == id){
 					btn.select();
-					var e = btn.getElement();
-					me.setPanelColor( btn.getColor('background') );
+					//var e = btn.getElement();
+					//me.setPanelColor( btn.getColor('background') );
 				} else {
 					btn.deSelect();
 				}

@@ -64,7 +64,8 @@ body{
 .pane{
 	overflow: hidden;
 	background-color: #fff;
-	
+	background-image: url('grey_wash_wall.png');
+
 }
 
 #wrapper{
@@ -96,7 +97,7 @@ body{
 	top:0px;
 	left:0px;
 	height: 100%;
-	min-width: 900px;
+	
 }
 
 #left-pane #page-container{

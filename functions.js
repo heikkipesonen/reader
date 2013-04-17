@@ -42,7 +42,7 @@ function getItem(array,key,value){
 function getItemDate(timestamp){
     var dt = new Date(timestamp*1000);
 
-    var str = dt.getDate() +'.'+ (dt.getMonth()+1) +'.'+dt.getFullYear() +' klo '+dt.getHours() +':'+dt.getMinutes();
+    var str = dt.getDate() +'.'+ (dt.getMonth()+1) +'.'+dt.getFullYear() +'  '+dt.getHours() +':'+dt.getMinutes();
     return str;
 }
 
