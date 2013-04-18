@@ -99,8 +99,6 @@ p{
 
 
 
-
->>>>>>> alterations:css/rupu.css
 #wrapper{
 	position: absolute;
 	top: 0px;
@@ -108,10 +106,7 @@ p{
 	width: 100%;
 	height: 100%;
 	overflow: hidden;	
-<<<<<<< HEAD:css/rupu.css
-=======
-		background-image: url('grey_wash_wall.png');
->>>>>>> alterations:css/rupu.css
+	background-image: url('grey_wash_wall.png');
 }
 
 
@@ -134,8 +129,8 @@ p{
 	top:0px;
 	left:0px;
 	height: 100%;
-	
-<<<<<<< HEAD:css/rupu.css
+
+}
 }
 
 #left-pane #page-container{
@@ -146,18 +141,6 @@ p{
 	height: 100%;
 }
 
-=======
-}
-
-#left-pane #page-container{
-	position: absolute;
-	right: 0px;
-	top: 0px;
-	width: 75%;
-	height: 100%;
-}
-
->>>>>>> alterations:css/rupu.css
 
 
 #left-pane #list{

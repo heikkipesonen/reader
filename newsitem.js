@@ -51,11 +51,7 @@ newsItem.prototype = {
 			if (this.content.length > 0){
 				var image= this.content[0];
 
-<<<<<<< HEAD
-				e.append('<div class="img-container"><img src="'+IMG_URL + image.name+'" class="big-image"/></div>');
-=======
 				e.append('<div class="img-container"><img src="'+SMALLIMG_URL + image.name+'" class="big-image"/></div>');
->>>>>>> alterations
 				d.addClass('has-image');				
 
 				if (image.sizes[0][1] > image.sizes[0][0]){
@@ -70,14 +66,12 @@ newsItem.prototype = {
 					.append('<span class="date">'+getItemDate(this.pubdate)+'</span>')
 					.append('<span style="background-color:'+colors.getColor(this.category)+'"class="category">'+this.category+'</span>');
 
-<<<<<<< HEAD
 				e.append('<div class="textcontainer"><p>'+this.getShortText(data)+'</p></div>');
-=======
 				if (this.getShortText(data)!= "" && this.getShortText(data).length > 20){
 
 				e.append('<div class="textcontainer"><p>'+this.getShortText(data)+'</p></div>');
 				}
->>>>>>> alterations
+
 			}
 
 
