@@ -242,10 +242,7 @@ rupu.prototype = {
 			top:0,
 			left:0
 
-		})
-
 		});
-
 
 		var leftWidth = window.innerWidth*0.5;
 		leftWidth = leftWidth < 700 ? window.innerWidth : leftWidth > 900 ? 900 : leftWidth;

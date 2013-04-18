@@ -66,10 +66,10 @@ newsItem.prototype = {
 					.append('<span class="date">'+getItemDate(this.pubdate)+'</span>')
 					.append('<span style="background-color:'+colors.getColor(this.category)+'"class="category">'+this.category+'</span>');
 
-				e.append('<div class="textcontainer"><p>'+this.getShortText(data)+'</p></div>');
+				
 				if (this.getShortText(data)!= "" && this.getShortText(data).length > 20){
 
-				e.append('<div class="textcontainer"><p>'+this.getShortText(data)+'</p></div>');
+					e.append('<div class="textcontainer"><p>'+this.getShortText(data)+'</p></div>');
 				}
 
 			}
