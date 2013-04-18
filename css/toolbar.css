@@ -1,8 +1,15 @@
 #toolbar{
 	position: absolute;
 	top:0px;
+<<<<<<< HEAD:css/toolbar.css
 	-webkit-box-shadow: inset  0px 0px 50px rgba(0, 0, 0, 1);        
     box-shadow: inset  0px 0px 50px rgba(0, 0, 0, 1);
+=======
+/*
+	-webkit-box-shadow: inset  0px 0px 50px rgba(0, 0, 0, 1);        
+    box-shadow: inset  0px 0px 50px rgba(0, 0, 0, 1);
+*/
+>>>>>>> alterations:css/toolbar.css
 }
 #toolbar_scroll #toolbar{
 	min-width: 100%;

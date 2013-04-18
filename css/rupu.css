@@ -1,4 +1,6 @@
-
+@import url(http://fonts.googleapis.com/css?family=Amethysta);
+@import url(http://fonts.googleapis.com/css?family=Coda+Caption:800);
+@import url(http://fonts.googleapis.com/css?family=Oxygen:400,300,700);
 /* http://meyerweb.com/eric/tools/css/reset/ 
    v2.0 | 20110126
    License: none (public domain)
@@ -63,11 +65,42 @@ body{
 
 .pane{
 	overflow: hidden;
+<<<<<<< HEAD:css/rupu.css
 	background-color: #fff;
 	background-image: url('grey_wash_wall.png');
 
 }
 
+=======
+	
+}
+
+
+
+h2, .button-text{
+	/*
+	font-family: 'Coda Caption', sans-serif;
+	*/
+	font-family: 'Amethysta', serif;
+	font-weight: bold;
+}
+
+p{
+	font-family: 'Oxygen', sans-serif;
+	font-weight: 300;
+}
+
+
+
+#page p{
+	font-weight: 400;
+}
+
+
+
+
+
+>>>>>>> alterations:css/rupu.css
 #wrapper{
 	position: absolute;
 	top: 0px;
@@ -75,6 +108,10 @@ body{
 	width: 100%;
 	height: 100%;
 	overflow: hidden;	
+<<<<<<< HEAD:css/rupu.css
+=======
+		background-image: url('grey_wash_wall.png');
+>>>>>>> alterations:css/rupu.css
 }
 
 
@@ -98,6 +135,7 @@ body{
 	left:0px;
 	height: 100%;
 	
+<<<<<<< HEAD:css/rupu.css
 }
 
 #left-pane #page-container{
@@ -108,6 +146,18 @@ body{
 	height: 100%;
 }
 
+=======
+}
+
+#left-pane #page-container{
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	width: 75%;
+	height: 100%;
+}
+
+>>>>>>> alterations:css/rupu.css
 
 
 #left-pane #list{

@@ -1,4 +1,5 @@
-var IMG_URL = 'http://ereading.metropolia.fi/puru/img/'; // image base url
+var SMALLIMG_URL = 'http://ereading.metropolia.fi/puru/img/small/'; // image base url
+var FULLIMG_URL = 'http://ereading.metropolia.fi/puru/img/'; // image base url
 var MAX_SIZE = 0;
 
 
@@ -133,12 +134,15 @@ rupu.prototype = {
 		$(window).resize(function(){
 			me.scale();
 		})
+<<<<<<< HEAD
 
 		/*
 		this._db.getDates(function(e){
 			console.log(e);
 		});
 		*/
+=======
+>>>>>>> alterations
 	},	
 	error:function(e){
 		console.log(e);
@@ -245,7 +249,11 @@ rupu.prototype = {
 		this.panes.list.css({
 			top:0,
 			left:0
+<<<<<<< HEAD
 		})
+=======
+		});
+>>>>>>> alterations
 
 		var leftWidth = window.innerWidth*0.5;
 		leftWidth = leftWidth < 700 ? window.innerWidth : leftWidth > 900 ? 900 : leftWidth;
@@ -256,7 +264,11 @@ rupu.prototype = {
 		});
 
 		this.panes.main.css({
+<<<<<<< HEAD
 			width:window.innerWidth,
+=======
+			width:window.innerWidth > 1500 ? 1500 : window.innerWidth,
+>>>>>>> alterations
 			left:this.panes.left.width()+this.panes.list.width(),
 			top:0
 		});
