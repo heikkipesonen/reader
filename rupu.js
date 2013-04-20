@@ -52,7 +52,7 @@ var rupu = function(){
 		hideScrollbar:true,
 		lockDirection:true
 	}
-	this.mainSrollOpts = {
+	this.mainScrollOpts = {
 		snap:'.pane',
 		momentum:false,
 		vScrollbar:false,
@@ -112,6 +112,7 @@ rupu.prototype = {
 
 		this.panes.left.hammer().on('tap',function(){
 			me._showPane('main-pane');
+			me._fire('hideItem');
 		});
 
 		this.tools.setSize(['100%','100%'])
@@ -273,7 +274,7 @@ rupu.prototype = {
 				this._mainScroll.refresh();
 			} else {
 				
-				this._mainScroll = new iScroll($(this._container).attr('id'),this.mainSrollOpts);				
+				this._mainScroll = new iScroll($(this._container).attr('id'),this.mainScrollOpts);				
 			}
 			
 			
@@ -362,7 +363,7 @@ rupu.prototype = {
 		this.tools.selectButton(cat);
 		var items = this._news.get('category',cat);
 		this.showItems(items);
-		this._fire('categoryChange',cat);
+		this._fire('showCategory',cat);
 		this._showPane('main-pane');
 	},
 	// show news item in left pane display
@@ -503,9 +504,6 @@ rupu.prototype = {
 		for (var i in items){
 			this._news.add(new newsItem(items[i]));
 		}
-	},
-	loadDatesSet:function(dates){
-
 	},
 	getDate:function(date,end_date,callback,fire){
 		var me = this;
