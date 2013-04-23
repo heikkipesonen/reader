@@ -6,26 +6,29 @@
 		<![if !IE]>
 		<script type="text/javascript" src="../lib/jquery-1.8.3.min.js"></script>
 		
-		<script type="text/javascript" src="../lib/iscroll.js"></script>
+		<script type="text/javascript" src="custom-iscroll.js"></script>
 		<script type="text/javascript" src="../lib/jquery.freetile.min.js"></script>
 		<script type="text/javascript" src="../lib/jquery.transit.js"></script>
 		<script type="text/javascript" src="../lib/hammer.min.js"></script>
 		<script type="text/javascript" src="../lib/jquery.hammer.min.js"></script>
 
-		<script type="text/javascript" src="newsParser.js"></script>
-		<script type="text/javascript" src="itembuilder.js"></script>
+		<!-- <script type="text/javascript" src="newsParser.js"></script>-->
+		<script type="text/javascript" src="dblink.js"></script>
+		<script type="text/javascript" src="newsitem.js"></script>
+		<script type="text/javascript" src="itemstore.js"></script>
 		<script type="text/javascript" src="functions.js"></script>
 		<script type="text/javascript" src="toolbar.js"></script>
-		<script type="text/javascript" src="gridmenu.js"></script>
+		<script type="text/javascript" src="usertracker.js"></script>
 		
 		<script type="text/javascript" src="rupu.js"></script>
 		<script type="text/javascript"> var browser=true;</script>
 		
-		<link rel="stylesheet" type="text/css" href="rupu.css"></link>
-		<link rel="stylesheet" type="text/css" href="toolbar.css"></link>
-		<link rel="stylesheet" type="text/css" href="item.css"></link>
-		<link rel="stylesheet" type="text/css" href="page.css"></link>
-		<link rel="stylesheet" type="text/css" href="gridmenu.css"></link>
+		<link rel="stylesheet" type="text/css" href="css/rupu.css"></link>
+		<link rel="stylesheet" type="text/css" href="css/toolbar.css"></link>
+		<link rel="stylesheet" type="text/css" href="css/item.css"></link>
+		<link rel="stylesheet" type="text/css" href="css/page.css"></link>
+		<link rel="stylesheet" type="text/css" href="css/gridmenu.css"></link>
+		<link rel="stylesheet" type="text/css" href="css/list.css"></link>
 
 		<![endif]>
 		<!--[if IE]>
@@ -38,67 +41,19 @@
 	<script type="text/javascript">
 
 
-
-
 	if (!browser){
 		document.write('Internet explorer not supported.');
 	} else {
 		$(function(){
-			$('#main-container').css('opacity',0);
-
 			var rp = new rupu();
-			rp.start('#main-container');
-			
+			var tracker = new userTracker(rp);
+
+			rp.start('#wrapper');
+			rp.getLatest();
+
 			rp.on('load',function(){
-				$('#startup-screen').transit({'opacity':0},1500,function(){
-					$(this).remove();
-				});
-				$('#main-container').transit({'opacity':1},1500);
-			});
 
-			rp.getDatesList(function(list){
-				each(list,function(item){
-					item._id = item.date;
-					item.largetext = item.date;
-					item.smalltext = item.count;
-				});
-
-				var gm = new gridMenu('date-menu');
-				$('body').prepend(gm.getElement());
-
-				gm.addButton({
-					largetext:'ok',
-					smalltext:'accept selection',
-					_id:'return'
-				});
-				gm.addButton({
-					largetext:'clear',
-					smalltext:'deselect',
-					_id:'deselect'
-				});				
-
-				gm.addButton(list);
-				gm.setSize(window.innerWidth,window.innerHeight);
-				gm.setOption('selectMany',true);
-
-				
-				gm.eachButton(function(btn){
-					btn.setBackgroundColor( bg[ dateParser.getMonth(btn.getId()) ] || bg.default);
-				});
-
-				gm.on('click',function(id,btn){
-					if (id=='return'){
-															
-						rp.getNews( gm.getSelectedId() ,false);
-
-						gm.getElement().remove();
-						
-					} else if (id=='deselect'){
-						gm.clear();
-					} else {						
-						gm.toggleButton(btn);
-					}
-				});
+				rp.showCategory('uutiset');		
 
 				
 			});
@@ -110,12 +65,7 @@
 	</script>
 
 <body>	
-	<!--
-	<div id="startup-screen">
-		<h1 class="startup">dmo</h1>
-	</div>
-	-->
-	<div id="main-container">	
+	<div id="wrapper">	
 		
 
 	</div>

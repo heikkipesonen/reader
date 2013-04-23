@@ -119,8 +119,8 @@ toolbar.prototype = {
 			this.buttons(function(btn){
 				if (btn._id == id){
 					btn.select();
-					var e = btn.getElement();
-					me.setPanelColor( btn.getColor('background') );
+					//var e = btn.getElement();
+					//me.setPanelColor( btn.getColor('background') );
 				} else {
 					btn.deSelect();
 				}
@@ -169,9 +169,10 @@ toolbar.prototype = {
 		},
 		setScroll:function(){
 			if (this._scroller){
-				this._scroller.destroy();
+				this._scroller.refresh();
+			} else {
+				this._scroller = new iScroll(this._element.container.attr('id'),{hScrollbar:false,vScrollbar:false});
 			}
-			this._scroller = new iScroll(this._element.container.attr('id'),{hScrollbar:false,vScrollbar:false});
 		},
 		setWidth:function(w){
 			this._element.container.css('width',w);

@@ -1,4 +1,5 @@
-var IMG_URL = 'http://ereading.metropolia.fi/puru/img/'; // image base url
+var SMALLIMG_URL = 'http://ereading.metropolia.fi/puru/img/small/'; // image base url
+var FULLIMG_URL = 'http://ereading.metropolia.fi/puru/img/'; // image base url
 var MAX_SIZE = 0;
 
 
@@ -51,271 +52,350 @@ var rupu = function(){
 		hideScrollbar:true,
 		lockDirection:true
 	}
+	this.mainScrollOpts = {
+		snap:'.pane',
+		momentum:false,
+		vScrollbar:false,
+		hScrollbar:false,
+		SnapThreshold:500,
+		lockDirection:true
+	}
+
+
 	// elements for rupu to use
 	this.panes = {	
+		overlay:$('<div id="overlay"></div>'),
+		top:$('<div id="top-bar"></div>'),
 		left : $('<div id="left-pane" class="pane"></div>'),
 		right : $('<div id="right-pane" class="pane"></div>'),
 		main : $('<div id="main-pane" class="pane"></div>'),
 		main_scroller : $('<div id="main-pane-scroller"></div>'),
 		main_content : $('<div id="main-pane-content"></div>'),
-		container : $('<div id="main"></div>'),
-		opts:{
-			rightPane:[20,100], // pane dimensions in percent, width and height
-			leftPane:[90,100],
-			mainPane:[96,100],
-			rightPaneMax:300,	// maximum width in pixels
-			rightPaneMin:200,	// minimum width in pixels
-			leftPaneMax:900,	// for left pane
-			leftPaneMin:600
-		}
+		container : $('<div id="main"></div>'),		
 	}
 
-	this.mainScroll = false; // iscroll for main element, the horizontal scroller
-	this.pageScroll=false;	// page, item display scroller
-	this.mainPaneScroll=false;	// main pane, the tile display scroll
+	this._mainScroll = false; // iscroll for main element, the horizontal scroller
+	this._pageScroll=false;	// page, item display scroller
+	this._mainPaneScroll=false;	// main pane, the tile display scroll
+	this._listScroll=false;
 	this.tools = {};		// toolbar
-	this.lastResizeTime=0;	// resize delay system, to be done.
-	this.resizeInterval=500;	
 	this._listeners =[]; // event listeners registered for rupu
+	this._dates = [];
+
+	this._db = new dblink({
+							url:'http://cdb.ereading.metropolia.fi/reader',
+							designDocument:'news'
+						});
+
+	this._news = new itemStore();
+
 }
 rupu.prototype = {
-	// percentage values for window sizes
-	getWidth:function(pc){
-		return pc[0]* (window.innerWidth/100)
-	},
-	getHeight:function(pc){
-		return pc[1]* (window.innerHeight/100)
-	},
 	// start rupu
 	// container is the element for rupu run in
 	start:function(container){
 		var me = this;
 		this.tools = new toolbar('toolbar');
 		this.panes.container
-				.append(this.panes.left)
-				.append(this.panes.main.append(this.panes.main_scroller.append(this.panes.main_content)))
+				//.append(this.panes.top)
+				.append(this.panes.left.append(this.panes.left_newscontainer))
+				//.append(this.panes.leftList)
+				.append(this.panes.main.append(this.panes.main_content))
+				//.append(this.panes.main_scroller.append(this.panes.main_content))
 				.append(this.panes.right);
 		
 
+		this.panes.overlay.append('<h1 id="loading">Vuotahan kohta</h1>');
+
 		$(container).append(this.panes.container);
 
+		this._container = $(container);
+
 		this.panes.left.hammer().on('tap',function(){
-			me.showPane('main-pane');
+			me._showPane('main-pane');
+			me._fire('hideItem');
 		});
 
 		this.tools.setSize(['100%','100%'])
-		this.panes.right.append( this.tools.getElement() );
-
-
-		$(window).resize(function(){
-			me.scale();
-		});
-
+		this.panes.right.append( this.tools.getElement() );	
 		
 		this.scale();
-		//this.getItems(1,false);
-		this._fire('start');
+		this._showPane('main-pane',0);
 
+		this._setMenu();
+		this._fire('start');	
 
-		//me.showCategory('etusivu');				
-		me.mainScroll = new iScroll('main-container',{snap:'.pane',momentum:false,vScrollbar:false,hScrollbar:false,SnapThreshold:500,lockDirection:true});
-		me.showPane('main-pane',0);
+		
+		this.on('load',function(){
+			me._setMenu();
+			me._sortItems();
+			me._showPane('main-pane');
+		});
+
+		this._onscale = false;
+
+		$(window).resize(function(){
+			if (!me.panes.overlay.is(':visible')){
+				me._showOverlay();
+			}
+			clearTimeout(me._onscale);
+			
+			me._onscale = setTimeout(function(){
+				me.scale();
+				
+			},500);
+		})
+
+	},	
+	error:function(e){
+		console.log(e);
+	},
+
+	_showOverlay:function(callback){
+		this._container.addClass('blur');
+		this.panes.overlay.css('opacity',0);
+		this._container.parent().append( this.panes.overlay );
+		this.panes.overlay.transit({
+			opacity:1,
+		},200);
 
 	},
+	_hideOverlay:function(callback){
+		var me = this;
+		if (me.panes.overlay.is(':visible')){
+			
+		this._container.removeClass('blur');
+		this.panes.overlay.transit({
+			opacity:0,
+		},200,
+		function(){
+			me.panes.overlay.remove();
+			if (typeof(callback) == 'function'){
+				callback();
+			}
+		});
+
+		}
+	},
+
+	getVisibleItem:function(){
+		return this.panes.left.find('#page').attr('data-item');
+	},
+	// percentage values for window sizes
+	_getWidth:function(pc){
+		return pc[0]* (window.innerWidth/100)
+	},
+	_getHeight:function(pc){
+		return pc[1]* (window.innerHeight/100)
+	},
+	useBigImage:function(){
+		if (window.innerWidth > 900){
+			return true;
+		} else {
+			return false;
+		}
+	},
 	// scale the elements according to screen size changes
-	scale:function() {
-		this.lastResizeTime = Date.now();
+	scale:function() {		
+		var me = this;
+		var leftWidth = window.innerWidth*0.5;
+		leftWidth = leftWidth < 700 ? window.innerWidth : leftWidth > 900 ? 900 : leftWidth;
+		
+		var topOffset = 0;//this.panes.top.height();
 
 		this.panes.left.css({
-			position:'absolute',
-			top:'0px',
-			left:'0px',
-			width:this.getWidth(this.panes.opts.leftPane) > this.panes.opts.leftPaneMax ? this.panes.opts.leftPaneMax : this.getWidth(this.panes.opts.leftPane) < this.panes.opts.leftPaneMin ? this.panes.opts.leftPaneMin : this.getWidth(this.panes.opts.leftPane),
-			height:this.getHeight(this.panes.opts.leftPane)
+			top:topOffset,
+			left:0,
+			width:leftWidth
 		});
 
 		this.panes.main.css({
-			position:'absolute',
-			top:'0px',
+			width:window.innerWidth,// > 1500 ? 1500 : window.innerWidth,
 			left:this.panes.left.width(),
-
-			width:this.getWidth(this.panes.opts.mainPane),
-			height:this.getHeight(this.panes.opts.mainPane)
-		});
-		
-		this.panes.main_scroller.css({
-			'min-height':this.panes.main.height(),
-			width:this.panes.main.width()
+			top:topOffset
 		});
 
 		this.panes.right.css({
-			position:'absolute',
-			top:'0px',
 			left:this.panes.left.width() + this.panes.main.width(),
-
-			width:this.getWidth(this.panes.opts.rightPane) > this.panes.opts.rightPaneMax ? this.panes.opts.rightPaneMax : this.getWidth(this.panes.opts.rightPane) < this.panes.opts.rightPaneMin ? this.panes.opts.rightPaneMin : this.getWidth(this.panes.opts.rightPane),
-			height:this.getHeight(this.panes.opts.rightPane)
+			top:topOffset
 		});
 
 		this.panes.container.css({
-			width:this.panes.left.width() + this.panes.main.width() + this.panes.right.width(),
-			height:window.innerHeight
+			width: this.panes.left.width() + this.panes.main.width() + this.panes.right.width()
 		});
 
+		try{
+			this._scrollRefresh();
+			this._tile();
 
-		if (this.mainPaneScroll && this.mainPaneScroll!=undefined){
-			this.mainPaneScroll.destroy();
+			if (this._mainScroll){
+				this._mainScroll.refresh();
+				this._showPane('main-pane',0);
+			} else {
+				
+				this._mainScroll = new iScroll($(this._container).attr('id'),this.mainScrollOpts);	
+				this._showPane('main-pane',0);
+			}
+			
+			
+
+		} catch (e){
+			this.error(e);
 		}
-		this.mainPaneScroll = new iScroll('main-pane',this.iscrollOpts);
-		if (this.tools){
-			this.tools.scaleHeight();
-		}
+
 		this._fire('scale');
+
 	},
-	// scroll to certain pane with mainscroll-horizontal scroll
-	showPane:function(id,time){
+	// scroll to certain pane with _mainScroll-horizontal scroll
+	_showPane:function(id,time){
 		if (time==undefined){
 			time=300;
 		}
-		if (this.mainScroll){
-			this.mainScroll.scrollToElement('#'+id,time);
+		if (this._mainScroll){
+			this._mainScroll.scrollToElement('#'+id,time);
 			this._fire('showPane',id);
 		}
 	},
 	// test news item size
-	testSize:function(item){
+	_testSize:function(item){
 		if (item.hasClass('smallListItem')){
 			return 's';
 		} else {
 			return 'b';
 		}
 	},
+	_sortSet:function(items){
+		items.sort(function(a,b){
+			if (a.priority && b.priority){
+				return a.priority - b.priority;
+			} else {
+				return 0;
+			}
+		})
+	},
 	// show category of items by category name
 	showItems:function(items){
-		var me = this;		
-		var types = newsParser.getTypeCount(items);
-		
-		console.log(types)
+		var me = this;				
+		var e = [];
 
-		var e = itemBuilder.build(items,{
-											b:'b',
-											s:'b',
-											tap:function(id){													
-												me.showItem(id); 
-											}
-										});
+		this._sortSet(items);
+		
+		each(items,function(item){
+			e.push(item.getTile());
+		});
 		
 
-
-		if (types.b%2 != 0){
-			var found =false;
-			
-			each(e,function(item){
-			 	if (me.testSize(item) == 'b' && item.hasClass('wide') && !found){
-					found = true;
-					item.addClass('important');
-				}
-			});
-			
-		}
-
-
-		this.showAtPane(e);
+		this._showAtPane(e);
 		this._fire('showItems',items);
+	},
+	showAll:function(){
+		this.showItems(this._news.getItems());
+		this._showPane('main-pane');
 	},
 	showCategory:function(cat){
 		this.tools.selectButton(cat);
-		var items = newsParser.getCategory(cat);
+		var items = this._news.get('category',cat);
 		this.showItems(items);
-		this._fire('categoryChange',cat);
-		this.showPane('main-pane');
+		this._fire('showCategory',cat);
+		
 	},
 	// show news item in left pane display
-	showItem:function(id){
+	showItem:function(id,scrollTo){
 		var me = this;
 		var container = this.panes.left;
 		
 		if (container.find('[data-item="'+id+'"]').length > 0){
-			me.showPane('left-pane');
+			if (scrollTo!=false){
+				me._showPane('left-pane');
+			}
 		} else {
-			var e = itemBuilder.fullView(id);
+			var e = this._news.find(id).getFull();
 
 			container.transit({
 				opacity:0,
 			},200,function(){
 				container.html(e);
-				me.showPane('left-pane');
-				if (me.pageScroll){
-					me.pageScroll.destroy();
+				if (scrollTo!=false){
+					me._showPane('left-pane');
+				}
+
+				if (me._pageScroll){
+					me._pageScroll.destroy();
 				}
 
 				container.transit({opacity:1});
-				me.pageScroll = new iScroll('page',this.iscrollOpts);
+				me._pageScroll = new iScroll('page',this.iscrollOpts);
 				me._fire('showItem',id);
 			});
-
 		}
 	},
-	showAtPane:function(items){
+	_scrollRefresh:function(){
+		if (this._mainPaneScroll && this._mainPaneScroll!=undefined){
+			this._mainPaneScroll.destroy();
+		}
+		
+		this._mainPaneScroll = new iScroll('main-pane',this.iscrollOpts);						
+	},
+	_tile:function(callback){
+		var container = this.panes.main_content;
+		var me = this;		
+		container.freetile({
+			containerResize:false,
+			animate:false,
+			callback:function(){
+				me._scrollRefresh();
+
+				container.transit({
+					opacity:1
+				},600,function(){
+					//me._fire('pageChangeReady');
+					if (typeof(callback) == 'function'){
+						callback();
+					}
+					me._fire('pageReady');
+					me._showPane('main-pane');
+					me._hideOverlay();
+				});
+			}
+		});
+	},
+	_showAtPane:function(content){
 		var container = this.panes.main_content;
 		var me = this;
 		
 		this._fire('pageChangeStart');
-		
+		this._showOverlay();
 
 		container.transit({
 			opacity:0
-		},200,function(){
+		},500,function(){
 
 			container.empty();
 		
-			each(items,function(item){
+			each(content,function(item){
+				item.hammer().on('tap',function(){
+					me.showItem($(this).attr('id'));
+				});
+
 				container.append(item);
+
 			});
 
-			container.freetile({
-				animate:false,
-				callback:function(){
-
-					if (me.mainPaneScroll && me.mainPaneScroll!=undefined){
-						me.mainPaneScroll.destroy();
-					}
-
-					me.mainPaneScroll = new iScroll('main-pane',me.iscrollOpts);
-
-					container.transit({
-						opacity:1
-					},200,function(){
-						me._fire('pageChangeReady');
-					});
-				}
-			});
+			me._tile();
 
 		})
 	},
-	setMenu:function(){
+	_setMenu:function(){
 		var me = this;
-		var categories = newsParser.getCategories();
-		
+		var categories = this._news.getKeys('category');		
 		me.tools.reset();
-
-		me.tools.addButton({
-			text:"valikko",
-			id:"menu",					
-			bg:colors['defaultColor'],
-			spancolor:[250,250,250,0.4],
-			action:function(id){
-				console.log(id);
-			},
-			target:"menu"
-		});
-
 		each(categories,function(catg){
+				catg = catg.toLowerCase();
 				me.tools.addButton({
-						text:catg.name,
-						id:catg.name,
-						span:catg.items,
-						bg:colors[catg.name] || colors['defaultColor'],
+						text:catg,
+						id:catg,
+						span:me.getCategory(catg).length,//me._news.get('category',catg).length,
+						bg:colors[catg] || colors['defaultColor'],
 						spancolor:[250,250,250,0.4],
 						action:function(id){
 							me.showCategory(id);
@@ -326,40 +406,83 @@ rupu.prototype = {
 
 		me.tools.scaleHeight();
 		me.scale();		
-	},		
-	getNews:function(date,end_date,callback){
-		var me = this;
-		this._fire('loadstart');
-		if (date instanceof Array){
-			var count = date.length;
-			for (var i in date){
-
-				newsParser.getNews(date[i],false,function(){
-					count--;
-					if (count == 0){
-						if (typeof(callback) == 'function'){
-							callback();
-						}						
-						me.setMenu();
-						me._fire('load');						
-					}
-				});
+	},
+	_sortItems:function(){
+		this._news.sort(function(a,b){
+			if (a.category > b.category){
+				return 1;
+			} else {
+				return -1;
 			}
+		});
+	},
+	getCategory:function(name){
+		return this._news.get('category',name);
+	},
+	getCategories:function(){
+		return this._news.getKeys('category');
+	},
+	_hasDate:function(date){
+		var found = false;
+		for (var i in this._dates){
+			if (this._dates[i] == date){
+				found = true;
+			}
+		}
+		return found;
+	},
+	_addNews:function(items){		
+		for (var i in items){
+			this._news.add(new newsItem(items[i]));
+		}
+	},
+	getLatest:function(){
+		var me = this;
+		this._db.getLatestDate(function(date){
 
+			if (date){
+				me.getDate(date);
+			}
+		});
+	},
+	getDate:function(date,end_date,callback,fire){
+		var me = this;
+		this._fire('loadstart');		
+		
+		if (date instanceof Array){
+			 var count = date.length;
 
-		} else {
-			newsParser.getNews(date,end_date,function(news){
-				if (news){
-					me.setMenu();
-					me._fire('load');
+			 for (var i in date){
+			 	this.getDate(date[i],false,function(e){
+			 		count--;
+
+				 	if (count == 0){
+				 		console.log('e');
+				 		me._fire('load');
+				 	}
+			 	},false);
+			 }
+		} else if (!this._hasDate(date)){
+
+			this._dates.push(date);
+
+			this._db.getView({
+				startkey:dateParser.convert(date),
+				endkey:dateParser.convert(end_date),
+				view:'strdate',
+				callback:function(e){
+					me._addNews(e);
+					if (typeof(callback) == 'function'){
+						callback(e);
+					}				
+					if (fire != false){
+						me._fire('load',e);
+					}
 				}
 			});
 		}
 	},
-	getDatesList:function(callback){
-		var me = this;
-		newsParser.getDatabaseDates(callback);
-	},
+
 	on:function(name,fn){		
 		if (this._listeners[name] == undefined){
 			this._listeners[name] = Array();
