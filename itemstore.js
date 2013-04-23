@@ -40,17 +40,20 @@ itemStore.prototype = {
 	},	
 	getIndex:function(item){
 		var found = false;
+		
 		for (var i in this._items){
 			if (typeof(item) == 'string'){
 				if (this._items[i]._id == item){
-					found = i;
+					found = parseInt(i);
 					break;
 				}
 			} else if (this._items[i] == item){
-				found = i;
+				found = parseInt(i);
 				break;
 			}
 		}
+
+
 		return found;
 	},
 	get:function(key,value){
