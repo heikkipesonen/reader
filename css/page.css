@@ -53,6 +53,8 @@
 	bottom: 20%;
 	right: 0%;
 	color: #fff;
+	overflow: hidden;
+	word-wrap: break-word;
 
 	text-shadow: 1px 0px 10px #000;
     filter: dropshadow(color=#000, offx=1, offy=0);

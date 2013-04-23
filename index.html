@@ -6,7 +6,7 @@
 		<![if !IE]>
 		<script type="text/javascript" src="../lib/jquery-1.8.3.min.js"></script>
 		
-		<script type="text/javascript" src="../lib/iscroll.js"></script>
+		<script type="text/javascript" src="custom-iscroll.js"></script>
 		<script type="text/javascript" src="../lib/jquery.freetile.min.js"></script>
 		<script type="text/javascript" src="../lib/jquery.transit.js"></script>
 		<script type="text/javascript" src="../lib/hammer.min.js"></script>
@@ -18,8 +18,7 @@
 		<script type="text/javascript" src="itemstore.js"></script>
 		<script type="text/javascript" src="functions.js"></script>
 		<script type="text/javascript" src="toolbar.js"></script>
-		<script type="text/javascript" src="gridmenu.js"></script>
-		<script type="text/javascript" src="newsblock.js"></script>
+		<script type="text/javascript" src="usertracker.js"></script>
 		
 		<script type="text/javascript" src="rupu.js"></script>
 		<script type="text/javascript"> var browser=true;</script>
@@ -42,21 +41,19 @@
 	<script type="text/javascript">
 
 
-
-
 	if (!browser){
 		document.write('Internet explorer not supported.');
 	} else {
 		$(function(){
 			var rp = new rupu();
-
+			var tracker = new userTracker(rp);
 
 			rp.start('#wrapper');
-			rp.getDate('10.04.2013');
+			rp.getLatest();
 
 			rp.on('load',function(){
 
-				rp.showAll();				
+				rp.showCategory('uutiset');		
 
 				
 			});
@@ -68,11 +65,6 @@
 	</script>
 
 <body>	
-	<!--
-	<div id="startup-screen">
-		<h1 class="startup">dmo</h1>
-	</div>
-	-->
 	<div id="wrapper">	
 		
 

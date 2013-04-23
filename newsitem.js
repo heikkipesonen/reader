@@ -50,9 +50,24 @@ newsItem.prototype = {
 		if (this.content){
 			if (this.content.length > 0){
 				var image= this.content[0];
+				var url = FULLIMG_URL;
 
-				e.append('<div class="img-container"><img src="'+SMALLIMG_URL + image.name+'" class="big-image"/></div>');
-				d.addClass('has-image');				
+				if (window.innerWidth > 700){
+					if (window.innerWidth/3 < (image.sizes[0][0])){
+						url = SMALLIMG_URL;
+					} 
+				} else {
+					if (window.innerWidth < (image.sizes[0][0]/2)){
+						url = SMALLIMG_URL;
+					} 
+				}
+
+				url +=  image.name;
+
+
+				e.append('<div class="img-container news-image"><img src="'+url+'" class="big-image"/></div>');
+				d.addClass('has-image');
+				d.attr('img-size',image.sizes[0][0] +','+image.sizes[0][1]);
 
 				if (image.sizes[0][1] > image.sizes[0][0]){
 					d.addClass('thin');
@@ -82,7 +97,7 @@ newsItem.prototype = {
 					.append('<span style="background-color:'+colors.getColor(this.category)+'"class="wide category">'+this.category+'</span>')
 					.append('<span class="date">'+getItemDate(this.pubdate)+'</span>')
 					.append( $('<div class="content"></div>')
-					.append('<h2>'+this.title+'</h2>')
+					.append('<h2  >'+this.title+'</h2>')
 					.append('<div class="textcontainer"><p>'+this.getShortText(data)+'</p></div>')
 
 					);

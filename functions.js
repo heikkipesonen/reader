@@ -1,4 +1,4 @@
-function createUUID() {
+function getId() {
     // http://www.ietf.org/rfc/rfc4122.txt
     var s = [];
     var hexDigits = "0123456789abcdef";
@@ -87,4 +87,4 @@ var dateParser = {
             return strangeDate;
         }
     }
-}
+} 

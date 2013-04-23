@@ -64,14 +64,14 @@ var rupu = function(){
 
 	// elements for rupu to use
 	this.panes = {	
+		overlay:$('<div id="overlay"></div>'),
+		top:$('<div id="top-bar"></div>'),
 		left : $('<div id="left-pane" class="pane"></div>'),
-		list : $('<div id="list-pane" class="pane"></div>'),
 		right : $('<div id="right-pane" class="pane"></div>'),
 		main : $('<div id="main-pane" class="pane"></div>'),
 		main_scroller : $('<div id="main-pane-scroller"></div>'),
 		main_content : $('<div id="main-pane-content"></div>'),
-		container : $('<div id="main"></div>'),
-		menu:$('<div id="date-menu" class="pane"></div>')
+		container : $('<div id="main"></div>'),		
 	}
 
 	this._mainScroll = false; // iscroll for main element, the horizontal scroller
@@ -97,7 +97,7 @@ rupu.prototype = {
 		var me = this;
 		this.tools = new toolbar('toolbar');
 		this.panes.container
-				.append(this.panes.list)
+				//.append(this.panes.top)
 				.append(this.panes.left.append(this.panes.left_newscontainer))
 				//.append(this.panes.leftList)
 				.append(this.panes.main.append(this.panes.main_content))
@@ -105,8 +105,9 @@ rupu.prototype = {
 				.append(this.panes.right);
 		
 
+		this.panes.overlay.append('<h1 id="loading">Vuotahan kohta</h1>');
+
 		$(container).append(this.panes.container);
-		$(container).append(this.panes.menu);
 
 		this._container = $(container);
 
@@ -128,105 +129,49 @@ rupu.prototype = {
 		this.on('load',function(){
 			me._setMenu();
 			me._sortItems();
-			me._createList();
 			me._showPane('main-pane');
 		});
 
+		this._onscale = false;
+
 		$(window).resize(function(){
-			me.scale();
+			clearTimeout(me._onscale);
+			
+			me._onscale = setTimeout(function(){
+				me.scale();
+			},300);
 		})
 
 	},	
 	error:function(e){
 		console.log(e);
 	},
-	_getDatesMenu:function(callback){
-		var me = this;
-		this._db.getDates(function(dates){
-			me._buildDateMenu(dates);
 
-			if (typeof(callback) == 'function'){
-				callback(me._dateMenu);
-			}
-		});
+	_showLoadScreen:function(callback){
+		this.panes.overlay.css('opacity',0);
+		this._container.prepend( this.panes.overlay );
+		this.panes.overlay.transit({
+			opacity:1,
+		},500);
+
 	},
-	_buildDateMenu:function(list){
-		var me = this;
-
-		each(list,function(item){
-			item._id = item.date;
-			item.largetext = item.date;
-			item.smalltext = item.count;
-		});
-
-
-		var gm = new gridMenu('menu');
-		gm.addButton({
-			largetext:'ok',
-			smalltext:'accept selection',
-			_id:'return'
-		});
-		gm.addButton({
-			largetext:'clear',
-			smalltext:'deselect',
-			_id:'deselect'
-		});				
-
-		gm.addButton(list);
-		gm.setSize(window.innerWidth,window.innerHeight);
-		gm.setOption('selectMany',true);
+	_hideLoadScreen:function(callback){
 		
-		gm.eachButton(function(btn){
-			btn.setBackgroundColor( bg[ dateParser.getMonth(btn.getId()) ] || bg.default);
+		var me = this;
+		this.panes.overlay.transit({
+			opacity:0,
+		},500,
+		function(){
+			me.panes.overlay.remove();
+			if (typeof(callback) == 'function'){
+				callback();
+			}
 		});
 
-		gm.on('click',function(id,btn){
-			if (id=='return'){
-													
-				me.getDate( gm.getSelectedId() ,false);
-				me.hideDateMenu();
-				
-			} else if (id=='deselect'){
-				gm.clear();
-			} else {						
-				gm.toggleButton(btn);
-			}
-		});		
-
-
-		this._dateMenu = gm;
-		this.panes.menu.html( gm.getElement() );
 	},
-	showDateMenu:function(){
-		var me = this;
-		if (this._dateMenu){
-			this.panes.menu.css({
-				opacity:0,
-				display:'block'
-			})
-			this.panes.menu.transit({
-				opacity:1
-			},500,function(){
-				me._fire('showDateMenu');
-			});
 
-		} else {
-			this._getDatesMenu(function(){
-				me.showDateMenu();
-			});
-		}
-	},
-	hideDateMenu:function(){
-		var me = this;
-		this.panes.menu.transit({
-			opacity:0
-		},function(){
-			me.panes.menu.css({
-				display:'none'
-			});
-
-			me._fire('hideDateMenu');
-		})
+	getVisibleItem:function(){
+		return this.panes.left.find('#page').attr('data-item');
 	},
 	// percentage values for window sizes
 	_getWidth:function(pc){
@@ -235,46 +180,51 @@ rupu.prototype = {
 	_getHeight:function(pc){
 		return pc[1]* (window.innerHeight/100)
 	},
-
+	useBigImage:function(){
+		if (window.innerWidth > 900){
+			return true;
+		} else {
+			return false;
+		}
+	},
 	// scale the elements according to screen size changes
 	scale:function() {		
-
-		this.panes.list.css({
-			top:0,
-			left:0
-
-		});
-
+		var me = this;
 		var leftWidth = window.innerWidth*0.5;
 		leftWidth = leftWidth < 700 ? window.innerWidth : leftWidth > 900 ? 900 : leftWidth;
+		
+		var topOffset = 0;//this.panes.top.height();
+
 		this.panes.left.css({
-			top:0,
-			left:this.panes.list.width(),
+			top:topOffset,
+			left:0,
 			width:leftWidth
 		});
 
 		this.panes.main.css({
-			width:window.innerWidth > 1500 ? 1500 : window.innerWidth,
-			left:this.panes.left.width()+this.panes.list.width(),
-			top:0
+			width:window.innerWidth,// > 1500 ? 1500 : window.innerWidth,
+			left:this.panes.left.width(),
+			top:topOffset
 		});
 
 		this.panes.right.css({
-			left:this.panes.left.width() + this.panes.main.width()+this.panes.list.width(),
-			top:0
+			left:this.panes.left.width() + this.panes.main.width(),
+			top:topOffset
 		});
 
 		this.panes.container.css({
-			width: this.panes.left.width() + this.panes.main.width() + this.panes.right.width()+this.panes.list.width()
+			width: this.panes.left.width() + this.panes.main.width() + this.panes.right.width()
 		});
 
 		try{
 			this._scrollRefresh();
 			if (this._mainScroll){
 				this._mainScroll.refresh();
+				this._showPane('main-pane',0);
 			} else {
 				
-				this._mainScroll = new iScroll($(this._container).attr('id'),this.mainScrollOpts);				
+				this._mainScroll = new iScroll($(this._container).attr('id'),this.mainScrollOpts);	
+				this._showPane('main-pane',0);
 			}
 			
 			
@@ -285,33 +235,6 @@ rupu.prototype = {
 
 		this._fire('scale');
 
-	},
-	_createList:function(){
-		try{
-
-			var list = $('<ul></ul>'),
-				me = this;
-
-			if (this._listScroll){
-				this._listScroll.destroy();
-			}
-
-			this.panes.list.html(list);
-
-			this._news.each(function(item){
-				list.append( item.getListItem() );
-			});
-
-
-			this._listScroll = new iScroll('list-pane',this.iscrollOpts)
-
-			list.find('li').hammer().on('tap',function(){
-				me.showItem($(this).attr('id'),false);
-			});
-
-		} catch (e){			
-			this.error(e);
-		}
 	},
 	// scroll to certain pane with _mainScroll-horizontal scroll
 	_showPane:function(id,time){
@@ -410,7 +333,7 @@ rupu.prototype = {
 		var me = this;
 		
 		this._fire('pageChangeStart');
-		
+		this._showLoadScreen();
 
 		container.transit({
 			opacity:0
@@ -435,8 +358,9 @@ rupu.prototype = {
 					container.transit({
 						opacity:1
 					},600,function(){
-						me._fire('pageChangeReady');
+						//me._fire('pageChangeReady');
 						me._fire('pageReady');
+						me._hideLoadScreen();
 					});
 				}
 			});
@@ -449,16 +373,6 @@ rupu.prototype = {
 		
 		me.tools.reset();
 
-		me.tools.addButton({
-			text:"valikko",
-			id:"menu",					
-			bg:colors['defaultColor'],
-			spancolor:[250,250,250,0.4],
-			action:function(id){
-				me.showDateMenu();
-			},
-			target:"menu"
-		});
 
 		
 		each(categories,function(catg){
@@ -504,6 +418,15 @@ rupu.prototype = {
 		for (var i in items){
 			this._news.add(new newsItem(items[i]));
 		}
+	},
+	getLatest:function(){
+		var me = this;
+		this._db.getLatestDate(function(date){
+
+			if (date){
+				me.getDate(date);
+			}
+		});
 	},
 	getDate:function(date,end_date,callback,fire){
 		var me = this;

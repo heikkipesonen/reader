@@ -18,6 +18,7 @@
 	height: 100%;
 }
 
+/*
 #toolbar .toolbar-button.selected:before{
 	content:" ";
 	position: absolute;
@@ -26,6 +27,7 @@
 	border-top:64px solid transparent;
 	border-bottom:64px solid transparent;
 }
+*/
 
 #toolbar .toolbar-button-container{
 	width: 80%;

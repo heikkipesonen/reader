@@ -10,6 +10,31 @@ function dblink(opts){
 }
 
 dblink.prototype = {
+	send:function(data,callback){
+		var type = 'POST';
+		var url = this._options.url;
+
+		if (data._id){
+			type = 'PUT';
+			url +='/'+data._id;
+		} 
+
+		console.log(data);
+
+		$.ajax({
+			'contentType': 'application/json',
+			'url':url,
+			'type':type,
+			'dataType':'json',
+			'data':JSON.stringify(data),
+			success:function(e){
+				callback(e);
+			},
+			error:function(e){
+				callback(false);
+			}
+		});
+	},
 	error:function(e){
 
 	},
@@ -21,6 +46,11 @@ dblink.prototype = {
 			}
 		}
 		return results;
+	},
+	getLatestDate:function(callback){
+		this.getDates(function(datesList){
+			callback(datesList[0].date);
+		})
 	},
 	getDates:function(callback){
 		/*

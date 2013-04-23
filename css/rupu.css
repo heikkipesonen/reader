@@ -1,6 +1,9 @@
 @import url(http://fonts.googleapis.com/css?family=Amethysta);
 @import url(http://fonts.googleapis.com/css?family=Coda+Caption:800);
 @import url(http://fonts.googleapis.com/css?family=Oxygen:400,300,700);
+
+@import url(http://fonts.googleapis.com/css?family=Noto+Sans:700,400);
+@import url(http://fonts.googleapis.com/css?family=Noto+Serif:400,700);
 /* http://meyerweb.com/eric/tools/css/reset/ 
    v2.0 | 20110126
    License: none (public domain)
@@ -65,28 +68,24 @@ body{
 
 .pane{
 	overflow: hidden;
-<<<<<<< HEAD:css/rupu.css
-	background-color: #fff;
-	background-image: url('grey_wash_wall.png');
 
 }
 
-=======
-	
-}
 
 
 
-h2, .button-text{
+h1,h3,h4,h2, .button-text{
 	/*
 	font-family: 'Coda Caption', sans-serif;
-	*/
 	font-family: 'Amethysta', serif;
+	*/
+	font-family: 'Noto Sans', sans-serif;
 	font-weight: bold;
 }
 
 p{
-	font-family: 'Oxygen', sans-serif;
+	/*font-family: 'Oxygen', sans-serif;*/
+	font-family: 'Noto Serif', serif;
 	font-weight: 300;
 }
 
@@ -129,8 +128,6 @@ p{
 	top:0px;
 	left:0px;
 	height: 100%;
-
-}
 }
 
 #left-pane #page-container{
@@ -141,6 +138,14 @@ p{
 	height: 100%;
 }
 
+
+#top-bar{
+	width: 100%;
+	height: 96px;
+	background-color: rgba(255,255,255,0.9);
+	box-shadow:  0px 0px 10px 0px rgba(0, 0, 0, 0.7);
+
+}
 
 
 #left-pane #list{
@@ -171,15 +176,27 @@ p{
 	position: absolute;
 }
 
-#startup-screen{
-	background-color: #ddd;
+
+#overlay{
+	background-color: rgba(0,0,0,0.7);
+	position: fixed;
 	width: 100%;
 	height: 100%;
-	position: fixed;
 	top:0px;
 	left:0px;
-	z-index: 5000;
-	background-image:url('nasty_fabric.png');
+	z-index: 349873;
+}
+
+#loading{
+	font-size: 70pt;
+	position: absolute;
+	top: 50%;
+	left: 0%;
+	width: 100%;
+	text-align: center;
+	color: rgba(255,255,255,1);
+	margin-top: -35pt;
+	text-shadow: 1px 1px 2px #ddd;
 }
 
 #startup-screen h1{
