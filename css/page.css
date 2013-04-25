@@ -7,8 +7,16 @@
 	padding-bottom: 100px;
 }
 
+#list-pane{
+	background-image: url('creampaper.png');
+}
+
 #page .news-page{
-	width: 100%;
+	width: 90%;
+	margin: 5%;
+	
+	padding-bottom: 50px;
+	padding-top: 20px;
 }
 
 #page .news-page .imagecontainer{
@@ -24,6 +32,16 @@
 	font-size: 30pt;
 }
 
+#page span.category{
+	display: none;
+	padding: 20px;
+	font-size: 20pt;
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	color: #fff;
+	z-index: 10;
+}
 
 #page.has-image .news-page h1{
 	max-width: 80%;
@@ -33,6 +51,8 @@
 	bottom: 20%;
 	right: 0%;
 	color: #fff;
+	overflow: hidden;
+	word-wrap: break-word;
 
 	text-shadow: 1px 0px 10px #000;
     filter: dropshadow(color=#000, offx=1, offy=0);
@@ -69,6 +89,8 @@
 
 
 #page  .news-page .textcontainer p{
+	text-align: justify;
 	line-height: 1.2em;
 	margin-top: 1em;
+	font-size: 12pt;
 }

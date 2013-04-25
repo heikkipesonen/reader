@@ -1,4 +1,4 @@
-function createUUID() {
+function getId() {
     // http://www.ietf.org/rfc/rfc4122.txt
     var s = [];
     var hexDigits = "0123456789abcdef";
@@ -42,12 +42,49 @@ function getItem(array,key,value){
 function getItemDate(timestamp){
     var dt = new Date(timestamp*1000);
 
-    var str = dt.getDate() +'.'+ (dt.getMonth()+1) +'.'+dt.getFullYear() +' klo '+dt.getHours() +':'+dt.getMinutes();
+    var str = dt.getDate() +'.'+ (dt.getMonth()+1) +'.'+dt.getFullYear() +'  '+dt.getHours() +':'+dt.getMinutes();
     return str;
 }
 
 function each(arr,fn){
-    for (var i in arr){
-        fn(arr[i],i);
+    if (arr instanceof Array){    
+        for (var i in arr){
+            fn(arr[i],i);
+        }
+    } else {
+        fn(arr,0);
     }
 }
+
+
+var dateParser = {
+    strangeDate:{
+        getMonth:function(dateString){
+            return dateString.split('.')[2];
+        },
+        getYear:function(dateString){
+            return dateString.split('.')[1];    
+        },
+        getDay:function(dateString){
+            return dateString.split('.')[0];    
+        }
+    },
+
+    getYear:function(dateString){
+        return dateString.split('.')[2];
+    },
+    getMonth:function(dateString){
+        return dateString.split('.')[1];
+    },
+    getDay:function(dateString){
+        return dateString.split('.')[0];
+    },
+
+    convert:function(strangeDate){
+        if (strangeDate){
+            return strangeDate.split('.')[2] +'.'+ strangeDate.split('.')[1] +'.'+strangeDate.split('.')[0];
+        } else {
+            return strangeDate;
+        }
+    }
+} 
