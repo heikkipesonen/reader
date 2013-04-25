@@ -113,8 +113,10 @@ newsItem.prototype = {
 		
 		var c = $('<div id="page" data-item="'+this._id+'" class="scale fullheight pagecontainer"></div>'),
 			scroll = $('<div id="page-scroll" class="page-scroll"></div>'),
+			
 			e = $('<div class="news-page"></div>');
 
+		scroll.append('<div class="top-edge"></div><div class="bottom-edge"></div>');
 		e.append('<span style="background-color: '+colors.getColor(item.category)+'" class="category">'+this.category+'</span>')
 
 		if (this.content){
@@ -162,20 +164,27 @@ newsItem.prototype = {
 	},
 	getShortText:function(len){
 		var t = $(this.text);
-		
+		var text = '';
+
 		if (len == undefined){
-			len = 100;
+			len = 150;
 		}
 
 		if ( $(t[1]).text().length < 70){ // tekijän nimi yleensä
-			var txt = $(t[1]).text() + $(t[2]).text();//.substr(0,len) + '...';
+			var txt = $(t[2]).text();//.substr(0,len) + '...';
 			$(t[2]).text(txt);
-			return $(t[2]).text();
+			text =  $(t[2]).text();
 		} else {
 			var txt = $(t[1]).text();//.substr(0,len) + '...';
 			$(t[1]).text(txt);
 			
-			return $(t[1]).text();
+			text =  $(t[1]).text();
 		}		
+
+		if (text.length > len){
+			text = text.substr(0,len) + '...';
+		}
+
+		return text;
 	}
-}
+};

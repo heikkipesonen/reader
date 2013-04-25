@@ -1,9 +1,20 @@
+#main-pane{
+	box-shadow: 0px 0px 25px 0px rgba(0, 0, 0, 0.9);
+}	
+
+#right-pane{
+	box-shadow: inset 0px 0px 25px 0px rgba(0, 0, 0, 0.9);
+}	
+
+
 #page{
 	width: 100%;
 	height: 100%;
 	margin: 0;
+	background-color: #fff;
 }
 #page-scroll{
+	position: relative;
 	padding-bottom: 100px;
 }
 
@@ -12,24 +23,44 @@
 }
 
 #page .news-page{
-	width: 90%;
-	margin: 5%;
-	
+	width: 100%;
+	margin: 0%;
 	padding-bottom: 50px;
-	padding-top: 20px;
 }
 
 #page .news-page .imagecontainer{
 	position: relative;
 	width: 100%;
+	background-image: url('grey_wash_wall.png');
 }
 #page .news-page .imagecontainer img{
-	width: 100%;
+	width: 90%;
+	margin-left: 5%;
 }
 
 #page .news-page h1{
 	padding: 20px;
 	font-size: 30pt;
+}
+
+.top-edge{
+	width: 100%;
+	height: 25px;
+	position: absolute;
+	top: 0px;
+	left:0px;
+	background-image: url('edge_up.png');
+	background-repeat: repeat-x;
+}
+
+.bottom-edge{
+	width: 100%;
+	height: 25px;
+	background-image: url('edge_down.png');
+	background-repeat: repeat-x;
+	position: absolute;
+	bottom: 0px;	
+	left:0px;
 }
 
 #page span.category{
@@ -48,7 +79,7 @@
 	padding: 20px;
 	font-size: 30pt;
 	position: absolute;
-	bottom: 20%;
+	bottom: 10%;
 	right: 0%;
 	color: #fff;
 	overflow: hidden;
@@ -59,8 +90,7 @@
 }
 
 #page.no-image .news-page .header{
-	margin-top: 70px;
-	padding-top: 20px;
+	padding-top: 70px;
 	padding-bottom: 20px;
 	width: 80%;
 	margin-left: 10%;
@@ -70,8 +100,13 @@
 
 
 #page  .news-page .textcontainer{
-	width: 80%;
-	margin: 10%;
+	
+	width: 90%;
+	
+	padding: 5%;
+	
+	margin-top: 2%;
+	
 }
 
 #page  .news-page .textcontainer strong{
@@ -93,4 +128,12 @@
 	line-height: 1.2em;
 	margin-top: 1em;
 	font-size: 12pt;
+}
+
+
+@media all and (min-width: 1600px){
+	#page .news-page .textcontainer{
+		width: 70%;
+		margin-left: 10%;
+	}
 }

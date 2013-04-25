@@ -2,47 +2,6 @@ var SMALLIMG_URL = 'http://ereading.metropolia.fi/puru/img/small/'; // image bas
 var FULLIMG_URL = 'http://ereading.metropolia.fi/puru/img/'; // image base url
 var MAX_SIZE = 0;
 
-
-// colors by news category, values in rgba-format
-
-var colors = {
-	etusivu:[0,0,0,0.8],
-	ulkomaat:[0,0,0,0.8],
-	uutiset:[0,105,153,0.6],
-	kulttuuri:[228,23,93,0.8],
-	urheilu:[90,55,120,0.8],
-	artikkeli:[0,136,130,0.8],
-	teema:[0,136,130,0.8],
-	defaultColor:[0,0,0,0.8],
-	getColor:function(name){
-		name = name.toLowerCase();
-		if (this[name]){	
-			return 'rgba('+this[name].join(',') +')';
-		} else {
-			return 'rgba('+this.defaultColor.join(',') +')';
-		}
-	}
-}
-
-var bg = {
-	'01':[147,186,122,1],
-	'02':[86,177,255,1],
-	'03':[120,100,239,1],
-	'04':[219,101,49,1],
-	'05':[91,195,89,1],
-	'06':[198,45,67,1],
-	'07':[200,255,200,1],
-	'08':[200,255,200,1],
-	'09':[200,255,200,1],
-	'10':[200,255,200,1],
-	'11':[200,255,200,1],
-	'12':[200,0,0,1],
-	'default':[198,45,67,1]
-}
-
-
-
-
 var rupu = function(){
 	// iscroll common options
 	this.iscrollOpts = {
@@ -52,6 +11,7 @@ var rupu = function(){
 		hideScrollbar:true,
 		lockDirection:true
 	}
+
 	this.mainScrollOpts = {
 		snap:'.pane',
 		momentum:false,
@@ -65,7 +25,7 @@ var rupu = function(){
 	// elements for rupu to use
 	this.panes = {	
 		overlay:$('<div id="overlay"></div>'),
-		top:$('<div id="top-bar"></div>'),
+		top:$('<div id="top-bar"><div id="date"><h2></h2></div><div id="brand"><img src="brand.png" alt="" /></div></div>'),
 		left : $('<div id="left-pane" class="pane"></div>'),
 		right : $('<div id="right-pane" class="pane"></div>'),
 		main : $('<div id="main-pane" class="pane"></div>'),
@@ -80,33 +40,28 @@ var rupu = function(){
 	this._listScroll=false;
 	this.tools = {};		// toolbar
 	this._listeners =[]; // event listeners registered for rupu
-	this._dates = [];
-
-	this._db = new dblink({
-							url:'http://cdb.ereading.metropolia.fi/reader',
-							designDocument:'news'
-						});
-
-	this._news = new itemStore();
 
 }
+
 rupu.prototype = {
 	// start rupu
 	// container is the element for rupu run in
 	start:function(container){
 		var me = this;
+		this._db = new dblink({
+								url:'http://cdb.ereading.metropolia.fi/reader',
+								designDocument:'news'
+							});
+
+		this._news = new itemStore();
 		this.tools = new toolbar('toolbar');
+
 		this.panes.container
-				//.append(this.panes.top)
 				.append(this.panes.left.append(this.panes.left_newscontainer))
-				//.append(this.panes.leftList)
 				.append(this.panes.main.append(this.panes.main_content))
-				//.append(this.panes.main_scroller.append(this.panes.main_content))
 				.append(this.panes.right);
-		
-
-		this.panes.overlay.append('<h1 id="loading">Vuotahan kohta</h1>');
-
+				
+		$(container).parent().append(this.panes.top);
 		$(container).append(this.panes.container);
 
 		this._container = $(container);
@@ -116,15 +71,12 @@ rupu.prototype = {
 			me._fire('hideItem');
 		});
 
+
+
+
 		this.tools.setSize(['100%','100%'])
 		this.panes.right.append( this.tools.getElement() );	
-		
-		this.scale();
-		this._showPane('main-pane',0);
-
-		this._setMenu();
-		this._fire('start');	
-
+	
 		
 		this.on('load',function(){
 			me._setMenu();
@@ -132,35 +84,132 @@ rupu.prototype = {
 			me._showPane('main-pane');
 		});
 
-		this._onscale = false;
-
 		$(window).resize(function(){
-			if (!me.panes.overlay.is(':visible')){
+			if (me.panes.container.is(':visible')){
 				me._showOverlay();
 			}
 			clearTimeout(me._onscale);
 			
 			me._onscale = setTimeout(function(){
 				me.scale();
-				
+				me._hideOverlay();		
 			},500);
-		})
+		});
 
-	},	
+		this._initTopMenu();
+		this._showPane('main-pane',0);
+		this._setMenu();
+		this._fire('start');	
+		this.scale();
+	},
+
+	_initTopMenu:function(){
+		var lastE = false, me = this,
+			menu = this.panes.top;
+
+		var listContainer = $('<div id="top-menu-list-container"></div>')
+			list = $('<ul id="top-menu-list"></ul>');
+		
+		menu.append(listContainer.append(list));
+
+		this._db.getDates(function(e){
+			for (var i in e){
+				list.append('<li class="top-menu-button '+e[i].date+'" data-date="'+e[i].date+'"><span class="date">'+e[i].date+'</span><span class="count">'+e[i].count+'</span></li>');
+			}
+
+			list.css({
+				width: (list.find('li').outerWidth(true) * list.find('li').length) + 10,
+			});
+	
+			list.find('li').hammer().on('tap',function(){
+				$(this).parent().find('.selected').removeClass('selected');
+				$(this).addClass('selected');
+
+				me.getOnlyDate($(this).attr('data-date'));
+			});
+		});
+
+
+		menu.hammer().on('tap',function(e){
+			e.stopPropagation();
+			if (me._isTopMenuVisible()){
+				me.hideTopMenu();
+			} else {
+				me.showTopMenu();
+			}
+		});
+
+		menu.hammer().on('dragdown',function(e){
+			e.stopPropagation();
+			
+			if (lastE){
+				if ((e.timeStamp - lastE.timeStamp)>400){		
+					me.showTopMenu();			
+				}
+			}
+
+			lastE = e;
+		});
+
+		menu.hammer().on('dragup',function(e){
+			e.stopPropagation();
+			
+			if (lastE){
+				if ((e.timeStamp - lastE.timeStamp)>400){
+					me.hideTopMenu();
+				}
+			}
+
+			lastE = e;
+		});
+	},
+	_isTopMenuVisible:function(){
+		return this.panes.top.hasClass('opened');
+	},
+	showTopMenu:function(callback,now){
+		this.panes.top.addClass('opened');
+
+		if (!now){		
+			this.panes.top.transit({
+				height:220
+			},300,callback);
+		} else {
+			this.panes.top.css('height',256);
+		}
+	},
+	hideTopMenu:function(callback,now){
+		this.panes.top.removeClass('opened');
+		if (!now){	
+			this.panes.top.transit({
+				height:64
+			},300,callback);
+		} else {
+			this.panes.top.css('height',64);
+		}
+	},
 	error:function(e){
 		console.log(e);
 	},
 
 	_showOverlay:function(callback){
+		this.panes.container.transit({
+			opacity:0
+		},200,callback);
+		/*
 		this._container.addClass('blur');
+
 		this.panes.overlay.css('opacity',0);
 		this._container.parent().append( this.panes.overlay );
 		this.panes.overlay.transit({
 			opacity:1,
 		},200);
-
+		*/
 	},
 	_hideOverlay:function(callback){
+		this.panes.container.transit({
+			opacity:1
+		},200,callback);
+		/*
 		var me = this;
 		if (me.panes.overlay.is(':visible')){
 			
@@ -176,6 +225,7 @@ rupu.prototype = {
 		});
 
 		}
+		*/
 	},
 
 	getVisibleItem:function(){
@@ -198,26 +248,30 @@ rupu.prototype = {
 	// scale the elements according to screen size changes
 	scale:function() {		
 		var me = this;
-		var leftWidth = window.innerWidth*0.5;
-		leftWidth = leftWidth < 700 ? window.innerWidth : leftWidth > 900 ? 900 : leftWidth;
-		
-		var topOffset = 0;//this.panes.top.height();
+		this.hideTopMenu(null,true);
+		var topOffset = 64;///this.panes.top.height();
+
+		this._container.css({
+			top:topOffset,
+			height:window.innerHeight-topOffset
+		})
 
 		this.panes.left.css({
-			top:topOffset,
+			top:0,
 			left:0,
-			width:leftWidth
+			width:window.innerWidth > 700 ? (window.innerWidth*0.5 < 700 ? 700 : window.innerWidth*0.5) :  (window.innerWidth > 1000 ? 1000 : window.innerWidth)
 		});
 
 		this.panes.main.css({
-			width:window.innerWidth,// > 1500 ? 1500 : window.innerWidth,
+			width:window.innerWidth > 1000 ? 1000 : window.innerWidth,
 			left:this.panes.left.width(),
-			top:topOffset
+			height:window.innerHeight - topOffset,
+			top:0
 		});
 
 		this.panes.right.css({
 			left:this.panes.left.width() + this.panes.main.width(),
-			top:topOffset
+			top:0
 		});
 
 		this.panes.container.css({
@@ -237,6 +291,11 @@ rupu.prototype = {
 				this._showPane('main-pane',0);
 			}
 			
+			if (this._listScroll){
+				this._listScroll.refresh();
+			} else {
+				this._listScroll = new iScroll('top-menu-list-container');
+			}
 			
 
 		} catch (e){
@@ -354,7 +413,7 @@ rupu.prototype = {
 					}
 					me._fire('pageReady');
 					me._showPane('main-pane');
-					me._hideOverlay();
+					//me._hideOverlay();
 				});
 			}
 		});
@@ -364,7 +423,7 @@ rupu.prototype = {
 		var me = this;
 		
 		this._fire('pageChangeStart');
-		this._showOverlay();
+		//this._showOverlay();
 
 		container.transit({
 			opacity:0
@@ -422,26 +481,29 @@ rupu.prototype = {
 	getCategories:function(){
 		return this._news.getKeys('category');
 	},
-	_hasDate:function(date){
-		var found = false;
-		for (var i in this._dates){
-			if (this._dates[i] == date){
-				found = true;
+	_addNews:function(items){
+		for (var i in items){
+			if (!this._news.hasItem('title',items[i].title)){
+				this._news.add(new newsItem(items[i]));
 			}
 		}
-		return found;
 	},
-	_addNews:function(items){		
-		for (var i in items){
-			this._news.add(new newsItem(items[i]));
-		}
+	getOnlyDate:function(date){
+		var me = this;
+		//this._showOverlay();
+
+		
+		this._news.empty();
+		this.getDate(date,false,function(){
+			//me._hideOverlay();
+			$('#date').find('h2').text(date);
+		});
 	},
 	getLatest:function(){
 		var me = this;
 		this._db.getLatestDate(function(date){
-
 			if (date){
-				me.getDate(date);
+				me.getOnlyDate(date);
 			}
 		});
 	},
@@ -462,9 +524,7 @@ rupu.prototype = {
 				 	}
 			 	},false);
 			 }
-		} else if (!this._hasDate(date)){
-
-			this._dates.push(date);
+		} else {
 
 			this._db.getView({
 				startkey:dateParser.convert(date),

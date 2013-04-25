@@ -19,8 +19,6 @@ dblink.prototype = {
 			url +='/'+data._id;
 		} 
 
-		console.log(data);
-
 		$.ajax({
 			'contentType': 'application/json',
 			'url':url,

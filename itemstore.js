@@ -78,6 +78,16 @@ itemStore.prototype = {
 		this._items.sort(sort);
 		return this._items;
 	},
+	hasItem:function(key,value){
+		var found = false;
+		for (var i in this._items){
+			if (this._items[i][key] == value){
+				found = true;
+				break;
+			}
+		}
+		return found;
+	},
 	isInArray:function(array,value){
 	    var found =false;
 	    for (var i in array){

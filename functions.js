@@ -1,3 +1,42 @@
+
+var colors = {
+    etusivu:[0,0,0,0.8],
+    ulkomaat:[0,0,0,0.8],
+    uutiset:[0,105,153,0.6],
+    kulttuuri:[228,23,93,0.8],
+    urheilu:[90,55,120,0.8],
+    artikkeli:[0,136,130,0.8],
+    teema:[0,136,130,0.8],
+    defaultColor:[0,0,0,0.8],
+    getColor:function(name){
+        name = name.toLowerCase();
+        if (this[name]){    
+            return 'rgba('+this[name].join(',') +')';
+        } else {
+            return 'rgba('+this.defaultColor.join(',') +')';
+        }
+    }
+}
+
+var bg = {
+    '01':[147,186,122,1],
+    '02':[86,177,255,1],
+    '03':[120,100,239,1],
+    '04':[219,101,49,1],
+    '05':[91,195,89,1],
+    '06':[198,45,67,1],
+    '07':[200,255,200,1],
+    '08':[200,255,200,1],
+    '09':[200,255,200,1],
+    '10':[200,255,200,1],
+    '11':[200,255,200,1],
+    '12':[200,0,0,1],
+    'default':[198,45,67,1]
+}
+
+
+
+
 function getId() {
     // http://www.ietf.org/rfc/rfc4122.txt
     var s = [];
