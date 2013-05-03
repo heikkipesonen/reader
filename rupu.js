@@ -85,12 +85,10 @@ rupu.prototype = {
 		});
 
 		$(window).resize(function(){
-			if (me.panes.container.is(':visible')){
-				me._showOverlay();
-			}
 			clearTimeout(me._onscale);
-			
+
 			me._onscale = setTimeout(function(){
+				
 				me.scale();
 				me._hideOverlay();		
 			},200);
@@ -192,40 +190,8 @@ rupu.prototype = {
 	},
 
 	_showOverlay:function(callback){
-		this.panes.container.transit({
-			opacity:0
-		},200,callback);
-		/*
-		this._container.addClass('blur');
-
-		this.panes.overlay.css('opacity',0);
-		this._container.parent().append( this.panes.overlay );
-		this.panes.overlay.transit({
-			opacity:1,
-		},200);
-		*/
 	},
 	_hideOverlay:function(callback){
-		this.panes.container.transit({
-			opacity:1
-		},200,callback);
-		/*
-		var me = this;
-		if (me.panes.overlay.is(':visible')){
-			
-		this._container.removeClass('blur');
-		this.panes.overlay.transit({
-			opacity:0,
-		},200,
-		function(){
-			me.panes.overlay.remove();
-			if (typeof(callback) == 'function'){
-				callback();
-			}
-		});
-
-		}
-		*/
 	},
 
 	getVisibleItem:function(){
@@ -263,7 +229,7 @@ rupu.prototype = {
 		});
 
 		this.panes.main.css({
-			width:window.innerWidth > 1000 ? 1000 : window.innerWidth,
+			width:window.innerWidth,
 			left:this.panes.left.width(),
 			height:window.innerHeight - topOffset,
 			top:0
@@ -301,8 +267,7 @@ rupu.prototype = {
 
 		} catch (e){
 			this.error(e);
-		}
-
+		}		
 		this._fire('scale');
 
 	},
@@ -399,25 +364,26 @@ rupu.prototype = {
 	_tile:function(callback){
 		var container = this.panes.main_content;
 		var me = this;		
+		
 		container.freetile({
 			containerResize:false,
 			animate:false,
 			callback:function(){
 				me._scrollRefresh();
+				me._showPane('main-pane');
 
 				container.transit({
 					opacity:1
-				},600,function(){
+				},300,function(){
 					//me._fire('pageChangeReady');
 					if (typeof(callback) == 'function'){
 						callback();
 					}
 					me._fire('pageReady');
-					me._showPane('main-pane');
-					//me._hideOverlay();
 				});
 			}
 		});
+
 	},
 	_showAtPane:function(content){
 		var container = this.panes.main_content;
@@ -428,7 +394,7 @@ rupu.prototype = {
 
 		container.transit({
 			opacity:0
-		},500,function(){
+		},200,function(){
 
 			container.empty();
 		
