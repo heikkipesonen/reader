@@ -116,7 +116,7 @@ newsItem.prototype = {
 			
 			e = $('<div class="news-page"></div>');
 
-		scroll.append('<div class="top-edge"></div><div class="bottom-edge"></div>');
+		//scroll.append('<div class="top-edge"></div><div class="bottom-edge"></div>');
 		e.append('<span style="background-color: '+colors.getColor(item.category)+'" class="category">'+this.category+'</span>')
 
 		if (this.content){

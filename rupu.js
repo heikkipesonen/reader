@@ -93,7 +93,7 @@ rupu.prototype = {
 			me._onscale = setTimeout(function(){
 				me.scale();
 				me._hideOverlay();		
-			},500);
+			},200);
 		});
 
 		this._initTopMenu();
@@ -281,6 +281,7 @@ rupu.prototype = {
 		try{
 			this._scrollRefresh();
 			this._tile();
+			this.tools.scaleHeight();
 
 			if (this._mainScroll){
 				this._mainScroll.refresh();
@@ -462,8 +463,7 @@ rupu.prototype = {
 						target:catg.name
 				});
 		});
-
-		me.tools.scaleHeight();
+	
 		me.scale();		
 	},
 	_sortItems:function(){
