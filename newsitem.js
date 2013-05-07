@@ -76,16 +76,18 @@ newsItem.prototype = {
 				}
 
 				e.find('.img-container')
-					.append('<h2 style="background-color:'+colors.getColor(this.category)+'">'+this.title+'</h2>')
+					//.append('<h2 style="background-color:'+colors.getColor(this.category)+'">'+this.title+'</h2>')
 					//.append('<div class="image-text" style="background-color:'+colors.getColor(this.category)+'">'+image.text+'</div>')
 					.append('<span class="date">'+getItemDate(this.pubdate)+'</span>')
 					.append('<span style="background-color:'+colors.getColor(this.category)+'"class="category">'+this.category+'</span>');
 
-				
+				var shortText = '';
 				if (this.getShortText(data)!= "" && this.getShortText(data).length > 20){
+				 shortText = '<p>'+this.getShortText(data)+'</p>';
 
-					e.append('<div class="textcontainer"><p>'+this.getShortText(data)+'</p></div>');
 				}
+				
+				e.append('<div class="textcontainer" style="background-color:'+colors.getColor(this.category)+'"><h2>'+this.title+'</h2>'+shortText+'</div>');
 
 			}
 

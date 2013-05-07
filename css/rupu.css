@@ -69,11 +69,6 @@ body{
 }
 
 
-.blur{
-	-webkit-filter: blur(5px);
-}
-
-
 h1,h3,h4,h2, .button-text{
 	/*
 	font-family: 'Coda Caption', sans-serif;
@@ -110,100 +105,32 @@ p{
 }
 
 
-#main{
-	min-width: 100%;
-	height: 100%;
-}
-
 #main-pane{
 	position: absolute;
 	top:0px;
-
-	width: 100%;
+	left: 10%;
+	width: 80%;
 	height: 100%;
+	border: 1px solid #d00;
 }
 
 
 #left-pane{
 	position: absolute;
 	top:0px;
-	left:0px;
+	left:-70%;
+	width: 80%;
 	height: 100%;
+	border: 1px solid #d00;
 }
 
-#left-pane #page-container{
-	position: absolute;
-	right: 0px;
-	top: 0px;
-	width: 75%;
-	height: 100%;
-}
-
-
-#left-pane #list{
-
-}
 
 #right-pane{
 	position: absolute;
 	height: 100%;
-	max-width: 250px;
-	min-width: 100px;
-	width: 25%;
-}
-
-#date-menu{
-	position: fixed;
+	width: 80%;
+	left: 90%;
 	top: 0px;
-	left: 0px;
-	z-index: 100;
-	width: 100%;
-	height: 100%;
-
-	background-color: #ffffff;
-	display: none;
+	border: 1px solid #d00;
 }
 
-#menu{
-	position: absolute;
-}
-
-
-#overlay{
-	background-color: rgba(255,255,255,0.9);
-	position: fixed;
-	width: 100%;
-	height: 100%;
-	top:0px;
-	left:0px;
-	z-index: 349873;
-}
-
-#loading{
-	display: none;
-	font-size: 70pt;
-	position: absolute;
-	top: 50%;
-	left: 0%;
-	width: 100%;
-	text-align: center;
-	color: rgba(255,255,255,1);
-	margin-top: -35pt;
-	text-shadow: 1px 1px 2px #ddd;
-}
-
-#startup-screen h1{
-	position: absolute;
-	top: 50%;
-	left:0px;
-	width: 100%;
-	font-size: 80pt;
-	font-weight: bold;
-	font-family: arial black, helvetica;
-	margin-top: -40pt;
-	text-align: center;
-	color: rgba(100,100,100,0.5);
-	text-transform: uppercase;
-	text-shadow: 2px 2px 1px #fff;
-    filter: dropshadow(color=#fff, offx=2, offy=2);	
-}

@@ -1,0 +1,140 @@
+<html>
+	<head>
+		<script type="text/javascript" src="../lib/jquery-1.8.3.min.js"></script>
+		<script type="text/javascript" src="../lib/jquery.hammer.min.js"></script>
+	<style type="text/css">
+		#perse{
+			position: absolute;
+			top: 0%;
+			left: 10%;
+			width: 80%;
+			height: 100%;
+			border: 1px solid #d00;
+			overflow: hidden;
+		}
+
+		.pane{
+			border: 1px solid #d00;
+			height: 90%;
+			width: 10%;
+			margin: 1%;
+		}
+	</style>
+	
+	<script type="text/javascript">
+
+	$.fn.extend({
+		switcher:function(opts){
+			var me = this,
+				_panes = [],
+				_container = $('<div class="scroll-container"></div>'),
+				_spare_left=$('<div class="left-container pane"></div>'),
+				_left=$('<div class="left-container pane"></div>'),
+				_spare_right=$('<div class="right-container pane"></div>'),
+				_right=$('<div class="right-container pane"></div>'),
+				_mid=$('<div class="mid-container pane"></div>'),
+				_list = opts.list;
+
+			_container.append(_spare_left).append(_left).append(_mid).append(_right).append(_spare_right);
+			this.html(_container);
+
+			_container.css({
+				position:'relative',
+				overflow:'hidden',
+				'min-width':'100%',
+				height:'100%'
+			});
+
+			_mid.css({
+				position:'absolute',
+				border:'7px solid #00d',
+				top:'0px',
+				left: me.innerWidth()/2 - _mid.outerWidth()/2
+			});
+
+			_left.css({
+				position:'absolute',
+				border:'7px solid #0d0',
+				left:(me.innerWidth()/2 - _mid.outerWidth()/2) - _left.outerWidth(true) +'px',
+				top:'0px'
+			});
+
+			_right.css({
+				position:'absolute',
+				border:'7px solid #0d0',
+				top:'0px',
+				left:parseInt(_mid.css('left')) + _mid.outerWidth(true) + 'px'
+			});
+
+			_spare_right.css({
+				position:'absolute',
+				top:'0px',
+				left:_mid.outerWidth(true) + _left.outerWidth(true) + _right.outerWidth(true)
+			});
+
+			this.css({
+				overflow:'hidden',
+				position:'relative'
+			});
+
+			this.hammer().on('drag',function(e){
+				e.stopPropagation();
+				e.preventDefault();
+				console.log(e);
+			});
+
+			function _show(name){
+
+			}
+
+			function _move(direction,amount){
+
+			}
+
+			function _getNext(name){
+				for (var i in _list){
+					if (_list[i] == name){
+						if (i<= _list.length && _list[i+1]!= undefined){
+							return _list[i+1];
+						} else {
+							return _list[0];
+						}
+					}
+				}
+			}
+
+			function _getPrev(name){
+				for (var i in _list){
+					if (_list[i] == name){
+						if (i>= 0 && _list[i-1]!= undefined){
+							return _list[i-1];
+						} else {
+							return _list[_list.length-1];
+						}
+					}
+				}				
+			}
+		}
+	});
+
+
+	$(function(){
+		$('#perse').switcher({
+			list:['perse','vittu','saatana','helvetti','jumalauta','kyrpä'],
+			onchange:function(list){
+				var content = $('<div id="'+list+'" class="pane"></div>');
+				return content;
+			}
+		});
+	});
+
+	</script>
+	</head>
+
+	<body>
+		<div id="perse">
+			
+
+		</div>
+	</body>
+</html>

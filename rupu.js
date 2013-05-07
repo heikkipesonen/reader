@@ -12,33 +12,7 @@ var rupu = function(){
 		lockDirection:true
 	}
 
-	this.mainScrollOpts = {
-		snap:'.pane',
-		momentum:false,
-		vScrollbar:false,
-		hScrollbar:false,
-		SnapThreshold:500,
-		lockDirection:true
-	}
-
-
-	// elements for rupu to use
-	this.panes = {	
-		overlay:$('<div id="overlay"></div>'),
-		top:$('<div id="top-bar"><div id="date"><h2></h2></div><div id="brand"><img src="brand.png" alt="" /></div></div>'),
-		left : $('<div id="left-pane" class="pane"></div>'),
-		right : $('<div id="right-pane" class="pane"></div>'),
-		main : $('<div id="main-pane" class="pane"></div>'),
-		main_scroller : $('<div id="main-pane-scroller"></div>'),
-		main_content : $('<div id="main-pane-content"></div>'),
-		container : $('<div id="main"></div>'),		
-	}
-
-	this._mainScroll = false; // iscroll for main element, the horizontal scroller
-	this._pageScroll=false;	// page, item display scroller
 	this._mainPaneScroll=false;	// main pane, the tile display scroll
-	this._listScroll=false;
-	this.tools = {};		// toolbar
 	this._listeners =[]; // event listeners registered for rupu
 
 }
@@ -48,38 +22,16 @@ rupu.prototype = {
 	// container is the element for rupu run in
 	start:function(container){
 		var me = this;
+		this._container = $(container);
 		this._db = new dblink({
 								url:'http://cdb.ereading.metropolia.fi/reader',
 								designDocument:'news'
 							});
 
 		this._news = new itemStore();
-		this.tools = new toolbar('toolbar');
-
-		this.panes.container
-				.append(this.panes.left.append(this.panes.left_newscontainer))
-				.append(this.panes.main.append(this.panes.main_content))
-				.append(this.panes.right);
-				
-		$(container).parent().append(this.panes.top);
-		$(container).append(this.panes.container);
-
-		this._container = $(container);
-
-		this.panes.left.hammer().on('tap',function(){
-			me._showPane('main-pane');
-			me._fire('hideItem');
-		});
-
-
-
-
-		this.tools.setSize(['100%','100%'])
-		this.panes.right.append( this.tools.getElement() );	
-	
 		
+
 		this.on('load',function(){
-			me._setMenu();
 			me._sortItems();
 			me._showPane('main-pane');
 		});
@@ -88,15 +40,12 @@ rupu.prototype = {
 			clearTimeout(me._onscale);
 
 			me._onscale = setTimeout(function(){
-				
-				me.scale();
-				me._hideOverlay();		
+				me.scale();			
 			},200);
 		});
 
-		this._initTopMenu();
-		this._showPane('main-pane',0);
-		this._setMenu();
+		//this._initTopMenu();
+		//this._showPane('main-pane',0);
 		this._fire('start');	
 		this.scale();
 	},
@@ -164,36 +113,10 @@ rupu.prototype = {
 	_isTopMenuVisible:function(){
 		return this.panes.top.hasClass('opened');
 	},
-	showTopMenu:function(callback,now){
-		this.panes.top.addClass('opened');
-
-		if (!now){		
-			this.panes.top.transit({
-				height:220
-			},300,callback);
-		} else {
-			this.panes.top.css('height',256);
-		}
-	},
-	hideTopMenu:function(callback,now){
-		this.panes.top.removeClass('opened');
-		if (!now){	
-			this.panes.top.transit({
-				height:64
-			},300,callback);
-		} else {
-			this.panes.top.css('height',64);
-		}
-	},
+	
 	error:function(e){
 		console.log(e);
 	},
-
-	_showOverlay:function(callback){
-	},
-	_hideOverlay:function(callback){
-	},
-
 	getVisibleItem:function(){
 		return this.panes.left.find('#page').attr('data-item');
 	},
@@ -213,62 +136,8 @@ rupu.prototype = {
 	},
 	// scale the elements according to screen size changes
 	scale:function() {		
-		var me = this;
-		this.hideTopMenu(null,true);
-		var topOffset = 64;///this.panes.top.height();
-
-		this._container.css({
-			top:topOffset,
-			height:window.innerHeight-topOffset
-		})
-
-		this.panes.left.css({
-			top:0,
-			left:0,
-			width:window.innerWidth > 700 ? (window.innerWidth*0.5 < 700 ? 700 : window.innerWidth*0.5) :  (window.innerWidth > 1000 ? 1000 : window.innerWidth)
-		});
-
-		this.panes.main.css({
-			width:window.innerWidth,
-			left:this.panes.left.width(),
-			height:window.innerHeight - topOffset,
-			top:0
-		});
-
-		this.panes.right.css({
-			left:this.panes.left.width() + this.panes.main.width(),
-			top:0
-		});
-
-		this.panes.container.css({
-			width: this.panes.left.width() + this.panes.main.width() + this.panes.right.width()
-		});
-
-		try{
-			this._scrollRefresh();
-			this._tile();
-			this.tools.scaleHeight();
-
-			if (this._mainScroll){
-				this._mainScroll.refresh();
-				this._showPane('main-pane',0);
-			} else {
-				
-				this._mainScroll = new iScroll($(this._container).attr('id'),this.mainScrollOpts);	
-				this._showPane('main-pane',0);
-			}
-			
-			if (this._listScroll){
-				this._listScroll.refresh();
-			} else {
-				this._listScroll = new iScroll('top-menu-list-container');
-			}
-			
-
-		} catch (e){
-			this.error(e);
-		}		
-		this._fire('scale');
+		var me = this;		
+		
 
 	},
 	// scroll to certain pane with _mainScroll-horizontal scroll
@@ -276,10 +145,12 @@ rupu.prototype = {
 		if (time==undefined){
 			time=300;
 		}
+
+		/*
 		if (this._mainScroll){
 			this._mainScroll.scrollToElement('#'+id,time);
 			this._fire('showPane',id);
-		}
+		}*/
 	},
 	// test news item size
 	_testSize:function(item){
@@ -318,7 +189,7 @@ rupu.prototype = {
 		this._showPane('main-pane');
 	},
 	showCategory:function(cat){
-		this.tools.selectButton(cat);
+	
 		var items = this._news.get('category',cat);
 		this.showItems(items);
 		this._fire('showCategory',cat);
@@ -362,7 +233,8 @@ rupu.prototype = {
 		this._mainPaneScroll = new iScroll('main-pane',this.iscrollOpts);						
 	},
 	_tile:function(callback){
-		var container = this.panes.main_content;
+		
+		var container = this._panes.main;
 		var me = this;		
 		
 		container.freetile({
@@ -383,10 +255,11 @@ rupu.prototype = {
 				});
 			}
 		});
-
+		
 	},
 	_showAtPane:function(content){
-		var container = this.panes.main_content;
+		
+		var container = this._panes.main;
 		var me = this;
 		
 		this._fire('pageChangeStart');
@@ -410,27 +283,7 @@ rupu.prototype = {
 			me._tile();
 
 		})
-	},
-	_setMenu:function(){
-		var me = this;
-		var categories = this._news.getKeys('category');		
-		me.tools.reset();
-		each(categories,function(catg){
-				catg = catg.toLowerCase();
-				me.tools.addButton({
-						text:catg,
-						id:catg,
-						span:me.getCategory(catg).length,//me._news.get('category',catg).length,
-						bg:colors[catg] || colors['defaultColor'],
-						spancolor:[250,250,250,0.4],
-						action:function(id){
-							me.showCategory(id);
-						},
-						target:catg.name
-				});
-		});
-	
-		me.scale();		
+		
 	},
 	_sortItems:function(){
 		this._news.sort(function(a,b){

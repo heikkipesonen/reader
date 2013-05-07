@@ -1,0 +1,167 @@
+<html>
+	<head>
+		<script type="text/javascript" src="../lib/jquery-1.8.3.min.js"></script>
+		<script type="text/javascript" src="../lib/jquery.hammer.min.js"></script>
+	<style type="text/css">
+		#perse{
+			position: relative;
+			width: 256px;
+			height: 256px;
+			border: 1px solid #d00;
+		}
+
+		#container{
+			position: absolute;
+			width: 50%;
+			height: 50%;
+			top: 25%;
+			left: 25%;
+			border: 1px solid #00d;
+		}
+		.vituke{
+			position: absolute;
+			width: 50%;
+			height: 50%;
+			left: 25%;
+			top: 25%;
+			background-color: #0d0;
+		}
+	</style>
+	
+	<script type="text/javascript">
+
+	$.fn.extend({
+		draggable:function(opts){
+			if (!opts){ 
+				opts = {};
+			}
+
+			var me = this,
+			bounds = false,
+			offset = this.offset(),
+			position = [offset.left,offset.top,opts.rotation || 0,opts.scale || 1],
+			maxScale = opts.maxScale || 2,
+			minScale = opts.minScale || 0.5,
+			maxX = Infinity,
+			maxY = Infinity,
+			minX = -Infinity,
+			minY = -Infinity,		
+			rotate = opts.rotate == undefined ? true : opts.rotate,
+			scale = opts.scale == undefined ? true : opts.scale,
+			dragx = opts.dragx == undefined ? true : opts.dragx,
+			dragy = opts.dragy == undefined ? true : opts.dragy,
+			originX = opts.originX || '50%',
+			originY = opts.originY	|| '50%',
+			maxRotation = opts.maxRotation || Infinity,
+			minRotation = opts.minRotation || -Infinity,
+			oldPosition = [];
+
+			if (opts.container){
+				bounds = $(opts.container);
+
+				maxX = bounds.offset().left + bounds.innerWidth();
+				minX = bounds.offset().left;
+				maxY = bounds.offset().top + bounds.innerHeight();
+				minY = bounds.offset().top;
+
+			}
+			_setPosition(position[0],position[1]);
+
+			this.on('mousedown',function(e){
+				e.preventDefault();
+				e.stopPropagation();
+
+				oldPosition = position;
+			});
+
+			this.hammer().on('touchstart',function(e){				
+				e.preventDefault();
+				e.stopPropagation();
+
+				oldPosition = position;
+			});
+
+			this.hammer().on('drag',function(e){				
+				e.preventDefault();
+				e.stopPropagation();
+
+				_setPosition(e.gesture.deltaX,e.gesture.deltaY);
+			});
+
+			this.hammer().on('transform',function(e){
+				e.preventDefault();
+				e.stopPropagation();
+				_setPosition(0,0,e.gesture.rotation,e.gesture.scale);
+				console.log(e.gesture.deltaY)
+			});
+
+			function _getSize(){
+				return {
+					x:me.outerWidth(true) * position[3],
+					y:me.outerHeight(true) * position[3]
+				}
+			}
+
+
+			function _setPosition(x,y,r,s){	
+				if (oldPosition[0] && dragx){	
+					x = oldPosition[0]+x;
+				} else if(!dragx){					
+					x = oldPosition[0] || 0;
+				}
+				if (oldPosition[1] && dragy){	
+					y = oldPosition[1]+y;
+				} else if (!dragy){					
+					y = oldPosition[1] || 0;
+				}
+
+				if (r){	r = oldPosition[2]+r;} else {r = oldPosition[2];}
+				if (s){s = oldPosition[3]*s; } else {s = oldPosition[3];} 
+				r = r == undefined ? 0 : r;
+				s = s == undefined ? 1 : s;
+				if (rotate){	
+					r = r > maxRotation ? maxRotation : r < minRotation ? minRotation : r;
+				} else {
+					r = 0;
+				}
+				s = s > maxScale ? maxScale : s < minScale ? minScale : s;
+				x = x > (maxX-_getSize().x) ? (maxX-_getSize().x) : x < minX ? minX : x;
+				y = y > (maxY-_getSize().y) ? (maxY-_getSize().y) : y < minY ? minY : y;
+				
+				me.css({ 
+					'transform':'translate('+x+'px' +','+y+'px) rotate('+r+'deg) scale('+s+')',
+					'transform-origin':originX+' '+originY,
+					/*
+					'-webkit-transform':'translate('+x+'px' +','+y+'px) rotate('+r+'deg) scale('+s+')',
+					'-webkit-transform-origin':originX+' '+originY,
+					'-moz-transform':'translate('+x+'px' +','+y+'px) rotate('+r+'deg) scale('+s+')',
+					'-moz-transform-origin':originX+' '+originY,
+					'-o-transform':'translate('+x+'px' +','+y+'px) rotate('+r+'deg) scale('+s+')',
+					'-o-transform-origin':originX+' '+originY,			
+					'-ms-transform':'translate('+x+'px' +','+y+'px) rotate('+r+'deg) scale('+s+')',
+					'-ms-transform-origin':originX+' '+originY,			
+					*/
+				});
+				position = [x,y,r,s];
+			}
+		}
+	});
+
+
+
+	$(function(){
+		$('#perse').draggable({
+			
+		});
+	});
+
+	</script>
+	</head>
+
+	<body>
+		<div id="container">
+			
+		</div>
+		<div id="perse"><div class="vituke"></div></div>
+	</body>
+</html>
