@@ -11,16 +11,16 @@ itemStore.prototype = {
 	},
 	each:function(fn){	      
         for (var i in this._items){
-            fn(this._items[i],i);
+            fn.call(this._items[i],this._items[i],i);
         }
 	},	
 	getPrev:function(id){
 		var index = this.getIndex(id);
-		if (index){
+		if (index!=false || index == 0){
 			if (this._items.length > index && this._items[index-1]){
 				return this._items[index-1];
-			} else if (this._items.length < index){
-				return this._items[0];
+			} else if (index == 0){				
+				return this._items[this._items.length-1];
 			}
 		} else {
 			return false;
@@ -28,10 +28,10 @@ itemStore.prototype = {
 	},
 	getNext:function(id){
 		var index = this.getIndex(id);
-		if (index){
+		if (index != false || index == 0){
 			if (this._items.length > index && this._items[index+1]){
 				return this._items[index+1];
-			} else if (this._items.length < index){
+			} else if ((this._items.length-1) <= index){				
 				return this._items[0];
 			}
 		} else {
@@ -40,7 +40,6 @@ itemStore.prototype = {
 	},	
 	getIndex:function(item){
 		var found = false;
-		
 		for (var i in this._items){
 			if (typeof(item) == 'string'){
 				if (this._items[i]._id == item){
@@ -52,8 +51,6 @@ itemStore.prototype = {
 				break;
 			}
 		}
-
-
 		return found;
 	},
 	get:function(key,value){
@@ -152,7 +149,7 @@ itemStore.prototype = {
 			for (var i in data){
 				this.addItem(data[i])
 			}
-		} else if (data.type == 'article'){
+		} else {
 			this._items.push( data );
 			this._fire('additem',data);
 		}
@@ -166,13 +163,13 @@ itemStore.prototype = {
 	_fire : function(evt,data,e){		
 		for (var i in this._listeners['all']){			
 			if (this._listeners['all'][i]!=undefined && typeof(this._listeners['all'][i])== 'function'){						
-				this._listeners['all'][i](evt,data,e);
+				this._listeners['all'][i].call(this,evt,data,e);
 			}
 		}
 		if (this._listeners[evt]!=undefined){
 			for (var i in this._listeners[evt]){
 				if (typeof(this._listeners[evt][i])=='function'){
-					this._listeners[evt][i](data,e);
+					this._listeners[evt][i].call(this,data,e);
 				}
 			}			
 		}
