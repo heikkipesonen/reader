@@ -16,7 +16,7 @@ newsItem.prototype = {
 
 		if (this.content){
 			if (this.content.length > 0){
-				e.append('<img src="'+IMG_URL +'thumb/'+ this.content[0].name+'" class="small-image"/>');
+				e.append('<img src="'+IMG_URL + this.content[0].name+'" class="small-image"/>');
 				e.addClass('has-image');
 			} else {
 				e.addClass('no-image');

@@ -1,5 +1,6 @@
 var SMALLIMG_URL = 'http://ereading.metropolia.fi/puru/img/small/'; // image base url
 var FULLIMG_URL = 'http://ereading.metropolia.fi/puru/img/'; // image base url
+//var FULLIMG_URL ='http://tablet.kp24.fi/data/attachment/';
 var MAX_SIZE = 0;
 
 var rupu = function(){
@@ -22,12 +23,6 @@ rupu.prototype = {
 	// container is the element for rupu run in
 	start:function(container){
 		var me = this;
-		this._panes = [];
-		this._swPanes = {
-			left:false,
-			right:false,
-			mid:false
-		};
 		this._container = $(container);
 		this._main = $('<div id="rupu-container"></div>');
 		this._container.html(this._main);
@@ -41,14 +36,37 @@ rupu.prototype = {
 		
 
 		this.on('load',function(){
+			
 			this._sortItems();
 			
 			var ct = me._news.getKeys('category');
-			for (var i in ct){
-				var e = $('<div class="pane" name="'+ct[i]+'"></div>');
-				this._panes.push( e );		
-			}
+			var pages = [];
+			
+			each(ct,function(category){
+				var items = me.getCategory(category);
+				var pg = $('<div class="news-category-page" id="'+category+'"></div>');
 
+				each(items,function(item){
+					//pg.append(item.title +'<br/><br/>');					
+					var e = item.getTile();
+					pg.append( e );
+
+					e.hammer().on('tap',function(evt){
+						console.log($(this).attr('id'))
+					});
+				});
+
+				pages.push(pg);
+			});
+
+			this._container.switcher({
+				paneWidth:'100%',
+				items:pages,
+				preventDefault:true,
+				onchange:function(e){
+					
+				}
+			});
 		});
 
 		$(window).resize(function(){
@@ -61,54 +79,6 @@ rupu.prototype = {
 		this.scale();
 		this._fire('start');		
 	},
-	showCategory:function(name){
-
-	},
-	_getIndex:function(name){
-		var found = false;
-
-		for (var i in this._panes){
-			if (this._panes[i].attr('name') == name){
-				found = i;
-				break;
-			}
-		}
-		return found;
-	},
-	_getPane:function(name){
-		var found = false;
-		for (var i in this._panes){
-			if (this._panes[i].attr('name') == name){
-				found = this._panes[i];
-				break;
-			}
-		}
-		return found;
-	},
-	_getPrevPane:function(name){
-		var i = this._getIndex(name);
-		if (i!=false){
-			if (i<0 && this._panes[i-1] != undefined){
-				return this._panes[i-1];
-			} else {
-				return this._panes[this._panes.length-1];
-			}
-		} else {
-			return false;
-		}
-	},
-	_getNextPane:function(name){
-		var i = this._getIndex(name);
-		if (i!=false){
-			if (this._panes.length > i && this._panes[i+1] != undefined){
-				return this._panes[i+1];
-			} else {
-				return this._panes[0];
-			}
-		} else {
-			return false;
-		}
-	},
 	// show category of items by category name	
 	showItems:function(items){
 		var me = this;				
@@ -120,9 +90,6 @@ rupu.prototype = {
 			//e.push(item.getTile());
 
 		});
-		
-
-		
 		this._fire('showItems',items);
 	},	
 	error:function(e){
@@ -149,14 +116,6 @@ rupu.prototype = {
 			position:'absolute'
 		});
 	},
-	_scrollRefresh:function(){
-		if (this._mainPaneScroll && this._mainPaneScroll!=undefined){
-			this._mainPaneScroll.destroy();
-		}
-		
-		this._mainPaneScroll = new iScroll('main-pane',this.iscrollOpts);						
-	},
-
 	getCategory:function(name){
 		return this._news.get('category',name);
 	},

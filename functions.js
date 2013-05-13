@@ -88,10 +88,10 @@ function getItemDate(timestamp){
 function each(arr,fn){
     if (arr instanceof Array){    
         for (var i in arr){
-            fn(arr[i],i);
+            fn.call(arr[i],arr[i],i);
         }
     } else {
-        fn(arr,0);
+        fn.call(arr,arr,0);
     }
 }
 
