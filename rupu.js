@@ -44,26 +44,51 @@ rupu.prototype = {
 			
 			each(ct,function(category){
 				var items = me.getCategory(category);
-				var pg = $('<div class="news-category-page" id="'+category+'"></div>');
+				var pg = $('<div class="news-category-page" style="background-color:'+colors.getColor(category)+';" id="'+category+'"></div>');
+				pg.append('<div class="category-header"><h2>'+category+'</h2></div>');
+
+				pg.append('<div class="category-container container-left"></div>').append('<div class="category-container container-mid"></div>').append('<div class="category-container container-right"></div>');
+				var y = 0;
+
+				me._sortSet(items);
 
 				each(items,function(item){
+
 					//pg.append(item.title +'<br/><br/>');					
 					var e = item.getTile();
-					pg.append( e );
+					
 
+					//pg.append( e );
+					if (y == 0){
+						pg.find('.container-left').append(e);
+					} else if (y==1){
+						pg.find('.container-mid').append(e);
+					} else {
+						pg.find('.container-right').append(e);
+					}
+					y++;
+
+					if (y>2){
+						y=0;
+					}
+
+	
 					e.hammer().on('tap',function(evt){
+
 						console.log($(this).attr('id'))
 					});
 				});
 
 				pages.push(pg);
+
 			});
 
 			this._container.switcher({
-				paneWidth:'100%',
+				paneWidth:'80%',
+				touches:1,
 				items:pages,
 				preventDefault:true,
-				onchange:function(e){
+				onchange:function(newPane){
 					
 				}
 			});

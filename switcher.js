@@ -150,30 +150,23 @@ $.fn.extend({
 
 		// touch event listeners
 		this.on('mousedown',function(e){
-			e.stopPropagation();
-			
 			_lastE = false;
 			_dummy.stop();
 			_totalDistance = 0;
 		});
 
 		this.hammer().on('touchstart',function(e){
-			if (opts.preventDefault){
-				e.stopPropagation();
-				
-			}
 			_lastE = false;
 			_dummy.stop();
 			_totalDistance = 0;
 		});
 
 		this.hammer({drag_max_touches:_touchesToMove}).on('drag',function(e){
-			if (opts.preventDefault){
-				e.stopPropagation();	
-				e.gesture.stopPropagation();
-				e.gesture.preventDefault();
-			}
 			
+			e.gesture.stopPropagation();
+			e.preventDefault();
+			e.stopPropagation();
+		
 			if (e.gesture.pointerType != 'touch' || e.gesture.touches.length >= _touchesToMove){
 				var x = e.gesture.deltaX;
 				if (_lastE){
@@ -194,13 +187,7 @@ $.fn.extend({
 			_checkPosition(v);
 		});
 
-		this.hammer().on('touchend',function(e){
-						
-			if (opts.preventDefault){
-				e.stopPropagation();
-				
-			}
-
+		this.hammer().on('touchend',function(e){						
 			var v = 0;
 			if (_lastE.gesture){
 				v = _lastE.gesture.velocityX;
@@ -395,15 +382,17 @@ $.fn.extend({
 		function _onDragEnd(){
 			if (opts.dragend){
 				var pane =  _getCenterPane();
-				opts.dragend.call(pane, _getListItem( _getIndex(pane)),_getListItemIndex(_getListItem( _getIndex(pane))),_getIndex(pane));					
+				opts.dragend.call(pane);
+				// _getListItem( _getIndex(pane)),_getListItemIndex(_getListItem( _getIndex(pane))),_getIndex(pane)
 			}
 		}
 
-		function _onchange(){
+		function _onchange(newPane){
 			if (opts.onchange){
 				var pane =  _getCenterPane();
 				if (_getIndex(pane) != _lastChange){
-					opts.onchange.call(pane, _getListItem( _getIndex(pane)),_getListItemIndex(_getListItem( _getIndex(pane))),_getIndex(pane));					
+					// _getListItem( _getIndex(pane)),_getListItemIndex(_getListItem( _getIndex(pane))),_getIndex(pane)
+					opts.onchange.call(pane,newPane);
 					_lastChange = _getIndex(pane);
 				}
 			}
@@ -426,7 +415,7 @@ $.fn.extend({
 				_offset++;
 				_setOffset();
 
-				_onchange();
+				_onchange(left);
 			} else if (Math.abs(_getOffsetToCenter(panes[4])) > 2.5*panes[0].outerWidth()){
 				var right = _getRightPane(),
 					left = _getLeftPane();					
@@ -435,7 +424,7 @@ $.fn.extend({
 				_offset--;
 				_setOffset();
 
-				_onchange();
+				_onchange(right);
 				
 			}
 

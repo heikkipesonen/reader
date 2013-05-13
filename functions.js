@@ -1,13 +1,13 @@
 
 var colors = {
-    etusivu:[0,0,0,0.8],
-    ulkomaat:[0,0,0,0.8],
-    uutiset:[0,105,153,0.6],
-    kulttuuri:[228,23,93,0.8],
-    urheilu:[90,55,120,0.8],
-    artikkeli:[0,136,130,0.8],
-    teema:[0,136,130,0.8],
-    defaultColor:[0,0,0,0.8],
+    etusivu:[0,0,0,1],
+    ulkomaat:[0,0,0,1],
+    uutiset:[0,105,153,1],
+    kulttuuri:[228,23,93,1],
+    urheilu:[90,55,120,1],
+    artikkeli:[0,136,130,1],
+    teema:[0,136,130,18],
+    defaultColor:[0,0,0,1],
     getColor:function(name){
         name = name.toLowerCase();
         if (this[name]){    
