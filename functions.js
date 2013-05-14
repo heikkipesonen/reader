@@ -1,17 +1,33 @@
 
 var colors = {
-    etusivu:[0,0,0,1],
-    ulkomaat:[0,0,0,1],
-    uutiset:[0,105,153,1],
-    kulttuuri:[228,23,93,1],
-    urheilu:[90,55,120,1],
-    artikkeli:[0,136,130,1],
-    teema:[0,136,130,18],
-    defaultColor:[0,0,0,1],
-    getColor:function(name){
+    etusivu:[0,0,0,0.8],
+    ulkomaat:[0,0,0,0.8],
+    uutiset:[0,105,153,0.8],
+    kulttuuri:[228,23,93,0.8],
+    urheilu:[90,55,120,0.8],
+    artikkeli:[0,136,130,0.8],
+    teema:[0,136,130,0.8],
+    defaultColor:[0,0,0,0.8],
+
+    'etusivu':[147,186,122,0.7],
+    'ulkomaat':[81, 135, 182, 1],
+    'kulttuuri':[219,101,49,0.7],
+    'urheilu':[91,195,89,0.7],
+    urheilu:[40, 162, 98, 0.7],
+    'teema':[198,45,67,0.7],
+    talous:[72, 162, 192, 0.7],
+    mielipide:[176, 192, 91, 0.7],
+    uutiset:[91, 109, 207, 0.7],
+
+    
+    getColor:function(name,alpha){
         name = name.toLowerCase();
         if (this[name]){    
-            return 'rgba('+this[name].join(',') +')';
+            if (alpha){
+                return 'rgba('+this[name][0]+','+this[name][1]+','+this[name][2]+','+alpha+')';
+            } else {                
+                return 'rgba('+this[name].join(',') +')';
+            }
         } else {
             return 'rgba('+this.defaultColor.join(',') +')';
         }

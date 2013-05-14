@@ -103,7 +103,7 @@ $.fn.extend({
 
 		var _panes = [],
 			_touchesToMove = opts.touches || 1,		
-			_offset = 0,
+			_offset = opts.offset || 0,
 			_items = opts.items || false,			
 			_tension = opts.tension || 0.2,
 			_dummy = $('<div id="dummy" />'),
@@ -162,10 +162,6 @@ $.fn.extend({
 		});
 
 		this.hammer({drag_max_touches:_touchesToMove}).on('drag',function(e){
-			
-			e.gesture.stopPropagation();
-			e.preventDefault();
-			e.stopPropagation();
 		
 			if (e.gesture.pointerType != 'touch' || e.gesture.touches.length >= _touchesToMove){
 				var x = e.gesture.deltaX;

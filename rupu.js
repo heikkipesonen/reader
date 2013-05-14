@@ -44,11 +44,14 @@ rupu.prototype = {
 			
 			each(ct,function(category){
 				var items = me.getCategory(category);
-				var pg = $('<div class="news-category-page" style="background-color:'+colors.getColor(category)+';" id="'+category+'"></div>');
-				pg.append('<div class="category-header"><h2>'+category+'</h2></div>');
+				var pgcontainer = $('<div class="news-category-page-container" style="background-color:'+colors.getColor(category,1)+';"></div>');
+				var pg = $('<div class="news-category-page" id="'+category+'"></div>');
+				
+				pgcontainer.append('<div class="category-header"><h2>'+category+'</h2></div>');
+				pgcontainer.append(pg);
 
-				pg.append('<div class="category-container container-left"></div>').append('<div class="category-container container-mid"></div>').append('<div class="category-container container-right"></div>');
-				var y = 0;
+				//pg.append('<div class="category-container container-left"></div>').append('<div class="category-container container-mid"></div>').append('<div class="category-container container-right"></div>');
+				//var y = 0;
 
 				me._sortSet(items);
 
@@ -56,9 +59,10 @@ rupu.prototype = {
 
 					//pg.append(item.title +'<br/><br/>');					
 					var e = item.getTile();
+					pg.append( e );
 					
 
-					//pg.append( e );
+					/*
 					if (y == 0){
 						pg.find('.container-left').append(e);
 					} else if (y==1){
@@ -71,20 +75,21 @@ rupu.prototype = {
 					if (y>2){
 						y=0;
 					}
-
-	
+					*/
+			
 					e.hammer().on('tap',function(evt){
 
 						console.log($(this).attr('id'))
 					});
 				});
 
-				pages.push(pg);
+				pages.push(pgcontainer);
 
 			});
 
 			this._container.switcher({
 				paneWidth:'80%',
+				offset:-1,
 				touches:1,
 				items:pages,
 				preventDefault:true,
@@ -104,6 +109,9 @@ rupu.prototype = {
 		this.scale();
 		this._fire('start');		
 	},
+	showItem:function(id){
+
+	},
 	// show category of items by category name	
 	showItems:function(items){
 		var me = this;				
@@ -119,9 +127,6 @@ rupu.prototype = {
 	},	
 	error:function(e){
 		console.log(e);
-	},
-	getVisibleItem:function(){
-		return this.panes.left.find('#page').attr('data-item');
 	},
 	useBigImage:function(){
 		if (window.innerWidth > 900){

@@ -51,20 +51,10 @@ newsItem.prototype = {
 			if (this.content.length > 0){
 				var image= this.content[0];
 				var url = FULLIMG_URL;
-
-				if (window.innerWidth > 700){
-					if (window.innerWidth/3 < (image.sizes[0][0])){
-						url = SMALLIMG_URL;
-					} 
-				} else {
-					if (window.innerWidth < (image.sizes[0][0]/2)){
-						url = SMALLIMG_URL;
-					} 
-				}
-
 				url +=  image.name;
 
-
+				//style="background-color:'+colors.getColor(this.category)+'"
+				e.append('<h2>'+this.title+'</h2>')
 				e.append('<div class="img-container news-image"><img src="'+url+'" class="big-image"/></div>');
 				d.addClass('has-image');
 				d.attr('img-size',image.sizes[0][0] +','+image.sizes[0][1]);
@@ -76,18 +66,17 @@ newsItem.prototype = {
 				}
 
 				e.find('.img-container')
-					//.append('<h2 style="background-color:'+colors.getColor(this.category)+'">'+this.title+'</h2>')
 					//.append('<div class="image-text" style="background-color:'+colors.getColor(this.category)+'">'+image.text+'</div>')
-					.append('<span class="date">'+getItemDate(this.pubdate)+'</span>')
 					.append('<span class="category">'+this.category+'</span>');
 
 				var shortText = '';
 				if (this.getShortText(data)!= "" && this.getShortText(data).length > 20){
-				 shortText = '<p>'+this.getShortText(data)+'</p>';
-
+				 	shortText = '<p>'+this.getShortText(data)+'</p>';
+					e.append('<div class="textcontainer" >'+shortText+'</div>');
 				}
+				e.append('<span class="date">'+getItemDate(this.pubdate)+'</span>')
+				// <h2>'+this.title+'</h2>
 				// style="background-color:'+colors.getColor(this.category)+'"
-				e.append('<div class="textcontainer" ><h2>'+this.title+'</h2>'+shortText+'</div>');
 
 			}
 
@@ -97,10 +86,10 @@ newsItem.prototype = {
 
 				e	
 					.append('<span style="background-color:'+colors.getColor(this.category)+'"class="wide category">'+this.category+'</span>')
-					.append('<span class="date">'+getItemDate(this.pubdate)+'</span>')
 					.append( $('<div class="content"></div>')
 					.append('<h2  >'+this.title+'</h2>')
 					.append('<div class="textcontainer"><p>'+this.getShortText(data)+'</p></div>')
+					.append('<span class="date">'+getItemDate(this.pubdate)+'</span>')
 
 					);
 
