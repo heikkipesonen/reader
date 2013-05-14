@@ -321,6 +321,7 @@ rupu.prototype = {
 		this.tools.selectButton(cat);
 		var items = this._news.get('category',cat);
 		this.showItems(items);
+		
 		this._fire('showCategory',cat);
 		
 	},

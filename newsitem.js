@@ -51,7 +51,7 @@ newsItem.prototype = {
 			if (this.content.length > 0){
 				var image= this.content[0];
 				var url = FULLIMG_URL;
-
+				/*
 				if (window.innerWidth > 700){
 					if (window.innerWidth/3 < (image.sizes[0][0])){
 						url = SMALLIMG_URL;
@@ -61,7 +61,7 @@ newsItem.prototype = {
 						url = SMALLIMG_URL;
 					} 
 				}
-
+				*/
 				url +=  image.name;
 
 
@@ -78,15 +78,14 @@ newsItem.prototype = {
 				e.find('.img-container')
 					.append('<h2 style="background-color:'+colors.getColor(this.category)+'">'+this.title+'</h2>')
 					//.append('<div class="image-text" style="background-color:'+colors.getColor(this.category)+'">'+image.text+'</div>')
-					.append('<span class="date">'+getItemDate(this.pubdate)+'</span>')
 					.append('<span style="background-color:'+colors.getColor(this.category)+'"class="category">'+this.category+'</span>');
 
 				
 				if (this.getShortText(data)!= "" && this.getShortText(data).length > 20){
-
 					e.append('<div class="textcontainer"><p>'+this.getShortText(data)+'</p></div>');
 				}
 
+				e.append('<span class="date">'+getItemDate(this.pubdate)+'</span>')
 			}
 
 
@@ -95,10 +94,10 @@ newsItem.prototype = {
 
 				e	
 					.append('<span style="background-color:'+colors.getColor(this.category)+'"class="wide category">'+this.category+'</span>')
-					.append('<span class="date">'+getItemDate(this.pubdate)+'</span>')
 					.append( $('<div class="content"></div>')
 					.append('<h2  >'+this.title+'</h2>')
 					.append('<div class="textcontainer"><p>'+this.getShortText(data)+'</p></div>')
+					.append('<span class="date">'+getItemDate(this.pubdate)+'</span>')
 
 					);
 

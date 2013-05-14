@@ -8,10 +8,14 @@ var colors = {
     artikkeli:[0,136,130,0.8],
     teema:[0,136,130,0.8],
     defaultColor:[0,0,0,0.8],
-    getColor:function(name){
+    getColor:function(name,opacity){
         name = name.toLowerCase();
         if (this[name]){    
-            return 'rgba('+this[name].join(',') +')';
+            if (opacity){
+                return 'rgba('+this[name][0]+','+this[name][1]+','+this[name][2]+',' +opacity +')';
+            } else {
+                return 'rgba('+this[name].join(',') +')';
+            }
         } else {
             return 'rgba('+this.defaultColor.join(',') +')';
         }
