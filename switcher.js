@@ -267,6 +267,10 @@ $.fn.extend({
 				panes[i].attr('list-index', _getListItemIndex(_getListItem(index)));
 			}
 
+			if (opts.onchange){
+				opts.onchange.call(_panes[2]);
+			}
+
 		}
 
 		function _getRightPane(){

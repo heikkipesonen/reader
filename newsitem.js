@@ -10,31 +10,6 @@ newsItem.prototype = {
 			this[i] = data[i];
 		}	
 	},
-	getListItem:function(){		
-		var e = $('<li class="clickable smallListItem listItem"></li>');
-		e.attr('id',this._id);
-
-		if (this.content){
-			if (this.content.length > 0){
-				e.append('<img src="'+IMG_URL + this.content[0].name+'" class="small-image"/>');
-				e.addClass('has-image');
-			} else {
-				e.addClass('no-image');
-			}
-		}else {
-			e.addClass('no-image');
-		}
-		//var c = $('<div class="textcontainer"></div>');
-
-		var c = $('<h4 style="color:'+colors.getColor(this.category,1)+'">'+this.title+'</h4>');
-
-		e.append('<span class="pubdate">'+getItemDate(this.pubdate)+'</span>');
-		e.append('<span class="category">'+this.category+'</span>')
-
-		e.append(c);
-
-		return e;
-	},
 	getTile:function(){
 		var data = this._data;
 		var d = $('<div class="item tile" data-action="showItem"  data-target="'+this._id+'"></div>');
@@ -53,8 +28,8 @@ newsItem.prototype = {
 				var url = FULLIMG_URL;
 				url +=  image.name;
 
-				//style="background-color:'+colors.getColor(this.category)+'"
-				e.append('<h2>'+this.title+'</h2>')
+				
+				e.append('<h2 style="background-color:'+colors.getColor(this.category,0.7)+'">'+this.title+'</h2>')
 				e.append('<div class="img-container news-image"><img src="'+url+'" class="big-image"/></div>');
 				d.addClass('has-image');
 				d.attr('img-size',image.sizes[0][0] +','+image.sizes[0][1]);
@@ -87,7 +62,8 @@ newsItem.prototype = {
 				e	
 					.append('<span style="background-color:'+colors.getColor(this.category)+'"class="wide category">'+this.category+'</span>')
 					.append( $('<div class="content"></div>')
-					.append('<h2  >'+this.title+'</h2>')
+					//.append('<h2  >'+this.title+'</h2>')
+					.append('<h2 style="background-color:'+colors.getColor(this.category,0.7)+'">'+this.title+'</h2>')
 					.append('<div class="textcontainer"><p>'+this.getShortText(data)+'</p></div>')
 					.append('<span class="date">'+getItemDate(this.pubdate)+'</span>')
 

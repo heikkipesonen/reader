@@ -49,40 +49,29 @@ rupu.prototype = {
 				
 				pgcontainer.append('<div class="category-header"><h2>'+category+'</h2></div>');
 				pgcontainer.append(pg);
-
-				//pg.append('<div class="category-container container-left"></div>').append('<div class="category-container container-mid"></div>').append('<div class="category-container container-right"></div>');
-				//var y = 0;
-
 				me._sortSet(items);
 
-				each(items,function(item){
+				var count = 0;
 
-					//pg.append(item.title +'<br/><br/>');					
+				each(items,function(item){
 					var e = item.getTile();
 					pg.append( e );
+					count++;
+
+					e.addClass('row-'+count);
+
+					if(count == 3){
+						count=0;
+					}
 					
-
-					/*
-					if (y == 0){
-						pg.find('.container-left').append(e);
-					} else if (y==1){
-						pg.find('.container-mid').append(e);
-					} else {
-						pg.find('.container-right').append(e);
-					}
-					y++;
-
-					if (y>2){
-						y=0;
-					}
-					*/
-			
-					e.hammer().on('tap',function(evt){
-
-						console.log($(this).attr('id'))
+					e.hammer().on('tap',function(evt){						
+						me.showItem($(this).attr('id'));
 					});
+
+					
 				});
 
+				
 				pages.push(pgcontainer);
 
 			});
@@ -93,8 +82,13 @@ rupu.prototype = {
 				touches:1,
 				items:pages,
 				preventDefault:true,
-				onchange:function(newPane){
-					
+				onchange:function(newPane){					
+					var me = this;
+					this.find('').imagesLoaded(function(){						
+						setTimeout(function(){
+							me.find('.news-category-page').isotope();
+						},100);
+					});
 				}
 			});
 		});
@@ -110,7 +104,7 @@ rupu.prototype = {
 		this._fire('start');		
 	},
 	showItem:function(id){
-
+		console.log(id);
 	},
 	// show category of items by category name	
 	showItems:function(items){

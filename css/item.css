@@ -1,5 +1,6 @@
 .news-category-page-container{
 	position: relative;
+	overflow-y: scroll;
 	height: 100%;
 }
 
@@ -7,7 +8,6 @@
 	height: 100%;
 	width: 90%;
 	margin-left: 10%;
-	overflow-y: scroll;
 }
 
 
@@ -64,28 +64,28 @@
 
 
 
+.row-1{
+	left: 0%;
+}
 
+.row-2{
+	
+}
 
+.row-3{
+	
+}
 
 
 .item.tile{
+	position: relative;
 	margin: 0.5%;
 	width: 32%;
-	background-color: rgba(255,255,255,0.5);
+	background-color: rgba(255,255,255,1);
 
-	
 	display: inline-block;
+	
 	vertical-align: top;
-
-	/* IE9 SVG, needs conditional override of 'filter' to 'none' */
-	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZmZmZmYiIHN0b3Atb3BhY2l0eT0iMC40NSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
-	background: -moz-linear-gradient(top,  rgba(255,255,255,1) 0%, rgba(255,255,255,1) 20%, rgba(255,255,255,0.45) 100%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,1)), color-stop(20%,rgba(255,255,255,1)), color-stop(100%,rgba(255,255,255,0.45))); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(255,255,255,1) 20%,rgba(255,255,255,0.45) 100%); /* Chrome10+,Safari5.1+ */
-	background: -o-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(255,255,255,1) 20%,rgba(255,255,255,0.45) 100%); /* Opera 11.10+ */
-	background: -ms-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(255,255,255,1) 20%,rgba(255,255,255,0.45) 100%); /* IE10+ */
-	background: linear-gradient(to bottom,  rgba(255,255,255,1) 0%,rgba(255,255,255,1) 20%,rgba(255,255,255,0.45) 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#73ffffff',GradientType=0 ); /* IE6-8 */
 
 		
 }
@@ -100,8 +100,8 @@
 	margin: 1%;
 		border: 1px solid #aaa;
 		background-image: url('creampaper.png');
-	box-shadow:  0px 0px 14px 0px rgba(0, 0, 0, 0.2);
 	*/
+	box-shadow:  0px 0px 14px 0px rgba(0, 0, 0, 0.2);
 }
 
 .item.tile.no-image .container{
@@ -113,17 +113,18 @@
 .item.tile .textcontainer{
 	padding: 2%;
 	font-size: 10pt;
-	color: #fff;
+	color: #222;
 	line-height: 1.3em;	
 	text-align: left;
 	padding-bottom: 20px;
 	
-	background-color:rgba(81, 81, 81, 1);
+	
 	
 	margin-bottom: 16px;
 
 	border-bottom: 1px solid #ddd;
 	border-top: 1px solid #222;
+	background-color: #fff;
 }
 
 
@@ -133,7 +134,7 @@
 	
 	top: 0px;
 	left: 0px;
-	color: #fff;
+	
 	padding: 4%;
 }
 
@@ -142,7 +143,7 @@
 	position: absolute;
 	left: 20%;
 	margin-left: -16px;
-	top: -15px;
+	top: -17px;
 	
 	border-left: 16px solid transparent;
 	border-right: 16px solid transparent;
@@ -154,49 +155,40 @@
 	position: absolute;
 	left: 20%;
 	margin-left: -16px;
-	top: -14px;
+	top: -16px;
 	
 	border-left: 16px solid transparent;
 	border-right: 16px solid transparent;
-	border-bottom: 16px solid rgba(81, 81, 81, 1);
+	border-bottom: 16px solid rgba(255,255, 255, 1);
 }
 
 .item.tile.no-image .textcontainer{
 	position: relative;
-	margin-top: 16px;
+	
 }
 
 .item.tile h2{
 	padding: 15px;
-
+	padding-bottom: 20px;
+	padding-top: 20px;
 	max-width: 100%;
 	word-wrap: break-word;
 	font-size: 16pt;
-	color: #222;
-	
+	color: #fff;
+	font-weight: bold;
 	
 	text-align: center;
-	
+		text-shadow: 0px 0px 5px #000;
 	filter: dropshadow(color=#000, offx=0, offy=0);
 }
 
 .item.tile.no-image h2{
-	padding: 0px;
-	bottom: 0%;	
-	margin-top: 16px;
 	
+	bottom: 0%;	
 	position: relative;
 	text-align: left;
 	
-	padding: 2% 5% 2% 5%;
-}
-
-.item.tile.thin h2{
-	bottom: 10%;
-}
-
-.item.tile.important h2{
-	bottom: 20%;
+	
 }
 
 .item.tile .img-container{
