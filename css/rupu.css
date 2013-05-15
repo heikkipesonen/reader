@@ -69,11 +69,6 @@ body{
 }
 
 
-.blur{
-	-webkit-filter: blur(5px);
-}
-
-
 h1,h3,h4,h2, .button-text{
 	/*
 	font-family: 'Coda Caption', sans-serif;
@@ -84,8 +79,9 @@ h1,h3,h4,h2, .button-text{
 
 }
 
-p{
+p,a,*{
 	/*font-family: 'Oxygen', sans-serif;*/
+	font-size: 11pt;
 	font-family: 'Noto Serif', serif;
 	font-weight: 300;
 }
@@ -106,8 +102,8 @@ p{
 	height: 100%;
 	overflow: hidden;	
 	background-color: #fff;
-background-image: url('creampaper.png');
 /*	
+background-image: url('creampaper.png');
 background-image: url('grey_wash_wall.png');
 */
 }

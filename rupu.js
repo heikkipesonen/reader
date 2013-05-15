@@ -110,6 +110,7 @@ rupu.prototype = {
 		
 		menu.append(listContainer.append(list));
 
+
 		this._db.getDates(function(e){
 			for (var i in e){
 				list.append('<li class="top-menu-button '+e[i].date+'" data-date="'+e[i].date+'"><span class="date">'+e[i].date+'</span><span class="count">'+e[i].count+'</span></li>');

@@ -74,11 +74,11 @@ newsItem.prototype = {
 				} else {
 					d.addClass('wide');
 				}
-
+				// style="background-color:'+colors.getColor(this.category)+'"
 				e.find('.img-container')
-					.append('<h2 style="background-color:'+colors.getColor(this.category)+'">'+this.title+'</h2>')
+					.append('<h2>'+this.title+'</h2>')
 					//.append('<div class="image-text" style="background-color:'+colors.getColor(this.category)+'">'+image.text+'</div>')
-					.append('<span style="background-color:'+colors.getColor(this.category)+'"class="category">'+this.category+'</span>');
+					//.append('<span style="background-color:'+colors.getColor(this.category)+'"class="category">'+this.category+'</span>');
 
 				
 				if (this.getShortText(data)!= "" && this.getShortText(data).length > 20){
@@ -93,7 +93,7 @@ newsItem.prototype = {
 				d.addClass('no-image');
 
 				e	
-					.append('<span style="background-color:'+colors.getColor(this.category)+'"class="wide category">'+this.category+'</span>')
+					//.append('<span style="background-color:'+colors.getColor(this.category)+'"class="wide category">'+this.category+'</span>')
 					.append( $('<div class="content"></div>')
 					.append('<h2  >'+this.title+'</h2>')
 					.append('<div class="textcontainer"><p>'+this.getShortText(data)+'</p></div>')
