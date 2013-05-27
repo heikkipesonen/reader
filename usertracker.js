@@ -5,6 +5,20 @@ function userTracker(_rupu,username){
 
 	
 	this._db = new ajaxQueue({url:'usertracker.php',dataType:'json',type:'POST'});
+	this._db.onError = function(err){
+		var e = {
+			time:Date.now(),
+			user_id:me._userData.user_id,
+			session_id:me._userData.session_id,
+			latitude:me._userData.latitude,
+			longitude: me._userData.longitude,
+			event_type:'db_error',
+			action:'error',
+			data:err.message || e.responseText
+		}
+		me._db.add({data:e});
+	}
+
 	
 	this._userData = {
 		'user_id':username,		
@@ -49,6 +63,7 @@ userTracker.prototype = {
 	bind:function(rupu){
 		var me = this;
 		if (rupu) this._rupu = rupu;
+		
 		this._rupu.on('tracker',function(e){
 			e.time = Date.now();
 			e.user_id = me._userData.user_id;
