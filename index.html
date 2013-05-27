@@ -1,23 +1,22 @@
-<html>
+<html lang="fi">
 	<head>
 		<meta charset="utf-8">
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
 		<![if !IE]>
 		<script type="text/javascript" src="../lib/jquery-1.8.3.min.js"></script>
+		<!-- <script type="text/javascript" src="Hyphenator.js"></script> -->
 		
-		<script type="text/javascript" src="custom-iscroll.js"></script>
-		<script type="text/javascript" src="../lib/jquery.freetile.min.js"></script>
-		<script type="text/javascript" src="../lib/jquery.transit.js"></script>
-		<script type="text/javascript" src="../lib/hammer.min.js"></script>
+		<script type="text/javascript" src="../lib/iscroll.js"></script>		
+		<script type="text/javascript" src="../lib/jquery.transit.min.js"></script>
 		<script type="text/javascript" src="../lib/jquery.hammer.min.js"></script>
 
-		<!-- <script type="text/javascript" src="newsParser.js"></script>-->
-		<script type="text/javascript" src="dblink.js"></script>
+		<script type="text/javascript" src="../lib/imagesloaded.js"></script>
+		<script type="text/javascript" src="../lib/packery.pkgd.min.js"></script>
+		
+
 		<script type="text/javascript" src="newsitem.js"></script>
-		<script type="text/javascript" src="itemstore.js"></script>
 		<script type="text/javascript" src="functions.js"></script>
-		<script type="text/javascript" src="toolbar.js"></script>
 		<script type="text/javascript" src="usertracker.js"></script>
 
 		
@@ -25,17 +24,63 @@
 		<script type="text/javascript"> var browser=true;</script>
 		
 		<link rel="stylesheet" type="text/css" href="css/rupu.css"></link>
-		<link rel="stylesheet" type="text/css" href="css/toolbar.css"></link>
 		<link rel="stylesheet" type="text/css" href="css/page.css"></link>
-		<link rel="stylesheet" type="text/css" href="css/gridmenu.css"></link>
-		<link rel="stylesheet" type="text/css" href="css/list.css"></link>
 		<link rel="stylesheet" type="text/css" href="css/item.css"></link>
-		<link rel="stylesheet" type="text/css" href="css/topbar.css"></link>
 
 		<![endif]>
 		<!--[if IE]>
 		<script type="text/javascript"> var browser=false;</script>
 		<![endif]-->
+		<title></title>
+		<style type="text/css">
+
+		#login{
+			position: absolute;
+			top: 0px;
+			left: 0px;
+			width: 100%;
+			height: 100%;
+			
+			background-color: rgb(176, 192, 91);
+		}
+		#login-container{
+			width: 100%;
+			position: absolute;
+			top: 30%;
+			text-align: center;
+		}
+
+		#login-container input{
+			width: 60%;
+			padding: 10px;
+			border: 1px solid #aaa;
+			border-radius: 5px;
+			margin: 10px;
+			display: block;
+			margin-left: 20%;
+			font-size: 14pt;
+			color: #666;
+			height: 60px;
+		}
+		#login-container h3{
+			font-size: 40pt;
+			margin: 20px;	
+		}
+
+		#login-container button{
+			width: 60%;
+			height: 60px;
+			border: 0px;
+			background-color: #fff;
+			border-radius: 5px;
+			font-size: 14pt;
+			color: #666;
+
+		}
+		#login-container button:active{
+			background-color: #0d0;
+		}
+		</style>
 	</head>
 
 
@@ -47,39 +92,68 @@
 		document.write('Internet explorer not supported.');
 	} else {
 		$(function(){
-			var rp = new rupu();
-			var tracker = new userTracker(rp);
 
-			rp.start('#wrapper');
-			rp.getLatest();
+			function login(username){
+				username = username.toLowerCase();
+				var d = dateParser.getDate(Date.now()),
+					accept = false;
 
-			rp.on('load',function(){
+				if (d == '25.5.2013'){
+					if (username == 'heer' || username == 'koe1'){
+						accept = true;
+					}
+				} else if( d=='26.5.2013'){
+					if (username == 'kapa' || username == 'koe3'){
+						accept = true;
+					}					
+				}
 
-				
-				rp.showCategory('uutiset');
-								
+				if (username == 'nextmedia' || username == 'aaltosci' || username == 'spurdo'){
+					accept = true;
+				}
+
+				return accept;
+			}
+
+			$('#username').keyup(function(e){
+				if(e.keyCode == 13){
+					start();
+				}
+			})
+
+			$('#login-button').click(function(){
+				start();
 			});
+
+			function start(){
+				var un = $('#username').val();
+				if (login( un )){
+					$('#login').remove();
+					var rp = new rupu();
+					var t = new userTracker(rp,un);
+					rp.start('#wrapper');
+				}				
+
+			}
 		});
 	}
 
 	
 
-	</script>
+	</script>	
 
 <body>	
-	
-	
-	<div id="wrapper">	
-		
 
+	<div id="wrapper">			
 	</div>
 
-</body>
-
-</html>
-
-		
-
+	<div id="login">
+		<div id="login-container">
+			<h3>kirjaudu</h3>
+			<input type="text" id="username" placeholder="käyttäjänimi" />
+			<input type="password" id="password"  placeholder="salasana" />
+			<button id="login-button">ok</button>
+		</div>
 	</div>
 
 </body>

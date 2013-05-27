@@ -1,44 +1,118 @@
 
 var colors = {
-    etusivu:[0,0,0,0.8],
-    ulkomaat:[0,0,0,0.8],
-    uutiset:[0,105,153,0.6],
-    kulttuuri:[228,23,93,0.8],
-    urheilu:[90,55,120,0.8],
-    artikkeli:[0,136,130,0.8],
-    teema:[0,136,130,0.8],
-    defaultColor:[0,0,0,0.8],
-    getColor:function(name,opacity){
-        name = name.toLowerCase();
-        if (this[name]){    
-            if (opacity){
-                return 'rgba('+this[name][0]+','+this[name][1]+','+this[name][2]+',' +opacity +')';
+    //categories:[255,255,255],
+    //categories:[211, 209, 185],
+    //categories:[255,222,75],
+    categories:[176, 192, 91],
+    defaultColor:[32,34,38],
+    'kulttuuri':[245,105,108],
+    'urheilu':[198,222,100],
+    'talous':[20,185,214],
+    
+    'teema':[198,222,100],
+    'uutiset':[69,109,189],
+    'mielipide':[89,196,188],
+    'artikkeli':[208, 212, 218],
+    'kotimaa':[255,222,75],
+    'ulkomaat':[94,109,129],
+    
+    'kulttuuri':[226, 101, 30],//[182, 76, 140],
+    'teema':[198,45,67],
+    kotimaa:[91, 109, 207],
+
+    /*
+    'etusivu':[31,187,166],
+    'ulkomaat':[201, 192, 95],
+    'urheilu':[91,195,89],
+    //urheilu:[40, 162, 98],
+    urheilu:[105, 204, 191],
+    talous:[72, 162, 192],
+    mielipide:[176, 192, 91],
+    
+    uutiset:[78, 78, 78],
+    */
+    viikonvaihde:[123, 70, 202],
+
+    getBackground:function(name,opacity){
+        return 'background-color:'+colors.getColor(name,opacity);
+    },
+    getColor:function(name,alpha){
+       if (name){    
+            name = name.toLowerCase();
+            if (this[name]){    
+                if (alpha){
+                    return 'rgba('+this[name][0]+','+this[name][1]+','+this[name][2]+','+alpha+')';
+                } else {                
+                    return 'rgb('+this[name].join(',') +')';
+                }
             } else {
-                return 'rgba('+this[name].join(',') +')';
+                if (alpha){
+                    return 'rgba('+this.defaultColor.join(',')+','+alpha +')'; 
+                } else return 'rgb('+this.defaultColor.join(',') +')';
             }
-        } else {
-            return 'rgba('+this.defaultColor.join(',') +')';
-        }
+       }
     }
 }
 
-var bg = {
-    '01':[147,186,122,1],
-    '02':[86,177,255,1],
-    '03':[120,100,239,1],
-    '04':[219,101,49,1],
-    '05':[91,195,89,1],
-    '06':[198,45,67,1],
-    '07':[200,255,200,1],
-    '08':[200,255,200,1],
-    '09':[200,255,200,1],
-    '10':[200,255,200,1],
-    '11':[200,255,200,1],
-    '12':[200,0,0,1],
-    'default':[198,45,67,1]
+$.fn.extend({
+
+    _getPosition:function(){
+        return {
+            top:parseFloat( this.attr('translate-y') ),
+            left:parseFloat( this.attr('translate-x') ),
+            unit:this.attr('translate-units')
+        }
+    },
+    
+    // makes functionality for each jquery element for translate command, prefixes are defined in prefix array
+    // only translates in relative coordinates
+    //
+    // uses translate-y and translate-x attributes for returning the current position
+    // also translate-units attribute is used, for easily read the units for translation,
+    // for example px or %
+
+    _translate:function(x,y,units){
+        var prefix = ['moz','o','ms','webkit'];
+
+        if (!units){
+            units = 'px';
+        }
+        
+        for (var i in prefix){
+            this.css('-'+prefix[i]+'-transform','translate3d('+x+units+','+y+units+',0px)');
+        }
+
+        this.attr('translate-x',x).attr('translate-y',y).attr('translate-units',units);
+        return this;
+    }
+});
+
+function fnqueue(callback){
+    this._queue = [];
+    this._callback = callback || function(){};
 }
 
-
+fnqueue.prototype = {
+    add:function(fn){
+        this._queue.push(fn);
+    },    
+    exec:function(){
+        var fn = this._queue.shift(),
+            me = this;
+        
+        if (fn){
+            fn(function(){
+                if (me._queue.length > 0){
+                    me.exec();
+                } else {
+                    me._callback(me);
+                }
+            });       
+        } else {
+            this._callback();
+        }
+    }
+}
 
 
 function getId() {
@@ -101,6 +175,7 @@ function each(arr,fn){
 
 
 var dateParser = {
+    days:['sunnuntai','maanantai','tiistai','keskiviikko','torstai','perjantai','lauantai'],
     strangeDate:{
         getMonth:function(dateString){
             return dateString.split('.')[2];
@@ -122,7 +197,12 @@ var dateParser = {
     getDay:function(dateString){
         return dateString.split('.')[0];
     },
+    getDate:function(timestamp){
+        var d = new Date(timestamp),
+            str = d.getDate() +'.'+ (d.getMonth()+1) +'.' +d.getFullYear();
 
+        return str;
+    },
     convert:function(strangeDate){
         if (strangeDate){
             return strangeDate.split('.')[2] +'.'+ strangeDate.split('.')[1] +'.'+strangeDate.split('.')[0];
