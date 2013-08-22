@@ -1,1 +1,1 @@
-licence GPLv3
+license GPLv3
