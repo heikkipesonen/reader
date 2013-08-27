@@ -31,8 +31,12 @@
 				} else {
 					echo json_encode(array('ok'=>true));	
 				}
-		} else if (isset($_POST['data']) && $_SESSION['login']==true){
+		} else if (isset($_POST['data'])){
 			$d = $_POST['data'];
+
+			if (!$_SESSION['user']){
+				$_SESSION['user'] = $d['user_id'];
+			}
 			
 			$str = 'INSERT INTO user_action (user_id,session_id,client_time,action,event_type,data,latitude,longitude) VALUES( '
 						.'\''.$_SESSION['user'].'\', '
@@ -46,7 +50,6 @@
 						.' )';			
 			
 			echo save($str);
-
 		}
 
 	}

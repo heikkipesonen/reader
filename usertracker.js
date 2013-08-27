@@ -6,6 +6,13 @@ function userTracker(_rupu,username){
 	
 	this._db = new ajaxQueue({url:'usertracker.php',dataType:'json',type:'POST'});
 	this._db.onError = function(err){
+		var er = '';
+		if (err.responseText){
+			er = err.responseText;
+		} else if (err.message){
+			er = err.message;
+		}
+
 		var e = {
 			time:Date.now(),
 			user_id:me._userData.user_id,
@@ -14,18 +21,24 @@ function userTracker(_rupu,username){
 			longitude: me._userData.longitude,
 			event_type:'db_error',
 			action:'error',
-			data:err.message || e.responseText
+			data:er
 		}
 		me._db.add({data:e});
 	}
 
+
+	var media = 'na';
+
+	if (window.styleMedia){
+		media = window.styleMedia.type;
+	}
 	
 	this._userData = {
 		'user_id':username,		
 		'start_time':Date.now(),
 		'window':[window.innerWidth,window.innerHeight],
 		'screen':[window.screen.width,window.screen.height],
-		'media':window.styleMedia.type,
+		'media':media,
 		'type':navigator.userAgent,
 		'vendor':navigator.vendor,
 		'latitude':0,

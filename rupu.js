@@ -1,6 +1,6 @@
 var //smallImageURL = 'http://ereading.metropolia.fi/puru/img/small/',
-	smallImageURL = 'http://ereading.metropolia.fi/puru/img/',
-	imageURL = 'http://ereading.metropolia.fi/puru/img/',
+	//smallImageURL = 'http://ereading.metropolia.fi/puru/img/',
+	//imageURL = 'http://ereading.metropolia.fi/puru/img/',
 	parserURL = 'parser.php';
 
 
@@ -16,7 +16,7 @@ var rupu = function(){
 
 	// elements for rupu to use
 	this.panes = {	
-		brand: $('<div id="brand-display"></div>'),
+		menu_tip : $('<div id="menu-tip"></div>'),
 		top: $('<div id="top-bar"></div>'),
 		left : $('<div id="left-pane" class="pane"></div>'),
 		right : $('<div id="right-pane" class="pane"></div>'),
@@ -42,60 +42,6 @@ var rupu = function(){
 }
 
 rupu.prototype = {
-	showCategories:function(){
-		if (this._loaded){
-			var list = this._getCategoryNames(),
-				me = this,
-				e = this.panes.menu_container,
-
-				brand = $([
-					'<div id="brand-display">',
-						'<h2 class="title">',this._source.title,'</h2>',
-						'<h2 class="datetime">',dateParser.getDate(this._source.timestamp*1000),'</h2>',
-						//'<img src="',this._source.image.url,'" alt="" />',
-					,'</div>'
-
-			].join(''));
-
-			e.append(brand);
-
-			for (var i in list){
-				if (list[i]){
-					var items =this.getCategory(list[i]);
-					this._sortSet(items);
-
-					var img = '';
-
-					for (var v in items){
-						if (items[v].hasImage()){
-
-							img = '<img src="'+smallImageURL+items[v].getImageName()+'"/>';
-							break;
-						}
-					}	
-					
-					var c = $('<div id="'+list[i]+'" class="category tile">'+img+'<h4 style="background-color:'+colors.getColor(list[i],0.7)+'">'+list[i]+'</h4></div>')
-					
-					c.hammer().on('tap',function(){
-						me.showCategory($(this).attr('id'));
-						me._fire('tracker',{'action':'open_category','event_type':'menubutton_tap','data':$(this).attr('id')});
-					});
-
-					c.css({
-						'background-color':colors.getColor(list[i]),
-					})
-
-					e.append(c);
-
-				}
-			}
-
-			
-			this._container.css('background-color',colors.getColor('categories',1));
-			this._menuScroll = new iScroll(this.panes.right.attr('id'),this.iscrollOpts);
-			this._tile();
-		}
-	},
 	// start rupu
 	// container is the element for rupu run in
 	start:function(container){
@@ -110,6 +56,7 @@ rupu.prototype = {
 				.append(this.panes.right.append(this.panes.menu_container_scroller.append(this.panes.menu_container)));
 				
 		$(container).append(this.panes.container);
+		this.panes.main.append(this.panes.menu_tip);
 
 		this._container = $(container);
 
@@ -128,6 +75,11 @@ rupu.prototype = {
 		});
 
 		this._lastEvent = false;
+
+		this.panes.menu_tip.hammer().on('tap',function(){
+			me._showPane('right-pane');
+		});
+
 		this.panes.container.on('mousedown',function(e){
 			me._lastEvent = false;
 		});
@@ -159,7 +111,7 @@ rupu.prototype = {
 		this.on('load',function(){
 			me._loaded = true;
 			me.scale();
-			me.showCategories();
+			me.showMenu();
 			me._showPane('right-pane');
 			me.overlay();
 
@@ -263,7 +215,7 @@ rupu.prototype = {
 		}
 	},
 	error:function(e){
-		if (e.stack) console.log(e.stack);
+		//if (e.stack) console.log(e.stack);
 		this._fire('tracker',{'action':'error','event_type':'error','data':e.message});
 		
 		this.overlay(true);
@@ -297,14 +249,15 @@ rupu.prototype = {
 		});
 
 		this.panes.main.css({
-			width:window.innerWidth,
+			width:window.innerWidth,//*0.9 < 700 ? window.innerWidth : window.innerWidth*0.9,
 			left:this.panes.left.width(),
 			height:window.innerHeight - topOffset,
 			top:0
 		});
 
+
 		this.panes.right.css({
-			width:window.innerWidth,
+			width:window.innerWidth,//*0.9 < 700 ? window.innerWidth : window.innerWidth*0.9,
 			left:this.panes.left.width() + this.panes.main.width(),
 			top:0
 		});
@@ -317,7 +270,14 @@ rupu.prototype = {
 
 		this._leftPos = 0;
 		this._mainPos = -this.panes.left.outerWidth(true);
-		this._rightPos = -(this.panes.left.outerWidth(true) + this.panes.right.outerWidth(true));
+
+		var offset = (window.innerWidth - this.panes.right.outerWidth(true)) /2;
+
+		//console.log(offset);
+
+		this._rightPos = -((this.panes.left.outerWidth(true) + this.panes.main.outerWidth(true))-offset);
+
+
 
 		var w = this.panes.main_content.innerWidth();
 
@@ -368,7 +328,7 @@ rupu.prototype = {
 				lastStep = cdist;
 
 			},
-			duration:200,
+			duration:300,
 			complete:callback
 		});
 	},
@@ -458,7 +418,7 @@ rupu.prototype = {
 		var position = 0;
 		if (id == 'main-pane'){
 			if (this._currentCategory){
-				position = -this.panes.left.outerWidth(true);				
+				position = this._mainPos;//-this.panes.left.outerWidth(true);				
 			} else {
 				this._showPane('right-pane');
 				return;
@@ -480,7 +440,7 @@ rupu.prototype = {
 				return;
 			}
 
-			position = -(this.panes.left.outerWidth(true) + this.panes.right.outerWidth(true));
+			position = this._rightPos;//-(this.panes.left.outerWidth(true) + this.panes.right.outerWidth(true));
 		}
 
 		var diff = -this.panes.container._getPosition().left + position;
@@ -505,6 +465,61 @@ rupu.prototype = {
 			}
 		})
 	},
+	showMenu:function(){
+		if (this._loaded){
+			var list = this._getCategoryNames(),
+				me = this,
+				e = this.panes.menu_container,
+
+				brand = $([
+					'<div id="brand-display">',
+						'<h2 class="title">',this._source.title,'</h2>',
+						//'<h4>testiversio',/*this._source.title,*/'</h4>',
+						'<h2 class="datetime">',dateParser.getDate(this._source.timestamp*1000),'</h2>',
+						//'<img src="',this._source.image.url,'" alt="" />',
+					,'</div>'
+
+			].join(''));
+
+			e.append(brand);
+
+			for (var i in list){
+				if (list[i]){
+					var items =this.getCategory(list[i]);
+					this._sortSet(items);
+
+					var img = '';
+
+					for (var v in items){
+						if (items[v].hasImage()){
+
+							img = '<img src="'+items[v].getImage()+'"/>';
+							break;
+						}
+					}	
+					
+					var c = $('<div id="'+list[i]+'" class="category tile">'+img+'<h4 style="background-color:'+colors.getColor(list[i],0.7)+'">'+list[i]+'</h4></div>')
+					
+					c.hammer().on('tap',function(){
+						me.showCategory($(this).attr('id'));
+						me._fire('tracker',{'action':'open_category','event_type':'menubutton_tap','data':$(this).attr('id')});
+					});
+
+					c.css({
+						'background-color':colors.getColor(list[i]),
+					})
+
+					e.append(c);
+
+				}
+			}
+
+			//this.panes.menu_tip.css('background-color',colors.getColor('categories',1));
+			this._container.css('background-color',colors.getColor('categories',1));
+			this._menuScroll = new iScroll(this.panes.right.attr('id'),this.iscrollOpts);
+			this._tile();
+		}
+	},	
 	// show category of items by category name
 	showItems:function(items,sort){
 		var me = this,
@@ -531,6 +546,8 @@ rupu.prototype = {
 		var items = this.getCategory(cat);
 
 		this.showItems(items);
+
+
 		this._container.css('background-color',colors.getColor(cat,1));
 		
 		this._fire('showCategory',cat);	
@@ -594,7 +611,7 @@ rupu.prototype = {
 			this._pageScroll.refresh();
 		}
 
-		this._mainPaneScroll = new iScroll('main-pane',this.iscrollOpts);						
+		this._mainPaneScroll = new iScroll('main-pane-scroller',this.iscrollOpts);						
 	},
 
 	_tile:function(callback){
@@ -620,7 +637,7 @@ rupu.prototype = {
 						gutter:gutter
 					});
 
-					me._scrollRefresh();					
+					me._scrollRefresh();	
 			});
 		}		
 
