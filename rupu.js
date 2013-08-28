@@ -37,8 +37,8 @@ var rupu = function(){
 	this._border = 0;
 	this._gutter = 16;
 	this._lang = 'fi';
-	this._maintitle = '';
-	this._subtitle = '';
+	//this._maintitle = '';
+	//this._subtitle = '';
 }
 
 rupu.prototype = {
@@ -116,6 +116,7 @@ rupu.prototype = {
 			me.overlay();
 
 			me._scrollRefresh();
+			me._setTitle();
 		});
 
 		$(window).resize(function(){
@@ -131,14 +132,13 @@ rupu.prototype = {
 			},200);
 		});
 		
-		$(function(){
-			document.title = this._maintitle || '';
-		});
-
 		this._fire('start');	
 		this._getData();
 
 		me._fire('tracker',{'action':'restart','event_type':'page reload','data':''});
+	},
+	_setTitle:function(){		
+		document.title = this._source.title || '';
 	},
 	loading:function(show){
 		var me = this;
@@ -178,10 +178,16 @@ rupu.prototype = {
 	overlay:function(show){
 		var me = this;
 		if (!this._overlay){
+			var title = 'reader';
+
+			if (this._source){
+				title = this._source.title;
+			}
+
 			this._overlay= $([
 				'<div id="overlay">',
-				'<h1 class="main-title">',this._maintitle,'</h1>',
- 				'<h3 class="sub-title">',this._subtitle,'</h3>',
+				'<h1 class="main-title">',title,'</h1>',
+ 				'<h3 class="sub-title">',dateParser.getDate(Date.now()),'</h3>',
  				'<img src="css/load-icon.png" alt="" class="clock-icon" />',
 				'</div>'
 			].join('')).css({
