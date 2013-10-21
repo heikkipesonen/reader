@@ -1,6 +1,11 @@
 <?php
 	date_default_timezone_set('Europe/Helsinki');
 	
+	// PLACE YOUR URL HERE
+	$url =  'MRSS-URL';
+	
+	
+	
 	function microtime_float()
 	{
 	    list($usec, $sec) = explode(" ", microtime());
@@ -8,7 +13,6 @@
 	}
 	
 	$start_time = microtime_float(); 
-	$url =  'http://tablet.kp24.fi/feed/rss.ashx';
 	$items = array();
 	
 	
