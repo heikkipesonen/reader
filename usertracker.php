@@ -57,7 +57,11 @@
 
 	function query($str){
 		try{
-			$p = new PDO("mysql:host=localhost;dbname=rupu_usertracker","mato","sukkamato");
+			$db = 'DBNAME';
+			$user = 'USRENAME';
+			$pwd = 'PASSWORD';
+			
+			$p = new PDO("mysql:host=localhost;dbname=".$db,$user,$pwd);
 		} catch (PDOException $e){
 			die( '{ok:false,message:"pdo init error"}' );
 		}
